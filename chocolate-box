@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # chocolate-box
 # Copyright (c) 2022 Nicholas Girga
 # Provides simple GUI for Chocolate DOOM.
@@ -30,9 +30,8 @@ class Main:
     # If extra information should be printed.
     verbose = False
 
-
-    # The path to the Chocolate DOOM executable.
-    executable = "/usr/bin/chocolate-doom"
+    # A custom path to the Chocolate DOOM executable.
+    executable = ""
 
 
     # The path to the Chocolate Box configuration directory.
@@ -205,7 +204,7 @@ class Main:
 
     # Called when the launch button is released.
     def on_launch_button_released(self, object, data = None):
-        command = [ self.executable ] # construct launch command
+        command = [ "/usr/bin/env", "chocolate-doom" ] # construct launch command
 
         window = self.builder.get_object("selection_window") # get window object
 
@@ -222,10 +221,11 @@ class Main:
 
         
         # start Chocolate DOOM
-        output = subprocess.run(command, capture_output = not self.verbose)
-        if output.returncode != 0:
-            warning_message = "WARNING!: Chocolate DOOM exited with a non-zero error code (" + str(output.returncode) + ")!"
-            print(warning_message)
+        try:
+            subprocess.run(command, capture_output = not self.verbose)
+        except Exception as e:
+            warning_message = "WARNING!: Chocolate DOOM threw an exception!"
+            print(str(e) + "\n" + warning_message)
             self.create_simple_message_dialog(warning_message, "Chocolate Box - Warning")
 
 
@@ -264,3 +264,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("Quitting (user request)...")
         sys.exit(0) # exit on KeyboardInterrupt
+    except Exception as e:
+        print(str(e))
+        sys.exit(7) # main instance interrupted; exit with code 7
