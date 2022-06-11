@@ -1,0 +1,133 @@
+#!/usr/bin/env python
+# chocolate-box
+# Copyright (c) 2022 Nicholas Girga
+# Provides simple GUI for Chocolate DOOM.
+
+
+# Imports
+import enum, gi, inputs, os, subprocess, sys
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+
+
+# Define main class.
+class Main:
+
+
+    # Ways that the launcher should behave after launching.
+    class LaunchBehavior(enum.Enum):
+        NONE = 0,           # launcher will do nothing after launch
+        MINIMIZE = 1,       # launcher will minimize after launch and present itself after Chocolate DOOM exits
+        STAY_MINIMIZED = 2, # launcher will minimize after launch
+        EXIT = 3            # launcher will hide after launch and exit when Chocolate DOOM exits
+
+
+    # How the launcher should behave after launching.
+    launch_behavior = LaunchBehavior.NONE
+
+
+    # If extra information should be printed.
+    verbose = False
+
+
+    # The path to the Chocolate DOOM executable.
+    executable = "/usr/bin/chocolate-doom"
+
+
+    # Initializes main class.
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+        # construct Gtk builder
+        self.gladefile = "./chocolate-box.ui"
+        self.builder = Gtk.Builder()
+        self.builder.add_from_file(self.gladefile)
+        self.builder.connect_signals(self)
+
+
+        # get and present main window
+        self.window = self.builder.get_object("selection_window")
+        self.window.present()
+
+    
+    # Called when the selection window is destroyed.
+    def on_selection_window_destroy(self, object, data = None):
+        Gtk.main_quit() # quit Gtk
+
+
+    # Will create a simple message dialog.
+    def create_simple_message_dialog(self, text: str, title = "Chocolate Box", yesno = False, window = None):
+        message = Gtk.MessageDialog(parent = window, flags = 0, message_type = Gtk.MessageType.INFO, buttons = Gtk.ButtonsType.YES_NO if yesno else Gtk.ButtonsType.OK, text = text)
+        message.set_title(title)
+        response = message.run()
+        message.destroy()
+        return response
+
+
+    # Informs user of incomplete features.
+    def not_implemented(self):
+        self.create_simple_message_dialog("This feature has not been implemented yet!", "Chocolate Box - Error")
+
+
+    # Called when the launch button is released.
+    def on_launch_button_released(self, object, data = None):
+        command = [ self.executable ] # construct launch command
+
+        window = self.builder.get_object("selection_window") # get window object
+
+        if window:
+            if self.launch_behavior == self.LaunchBehavior.MINIMIZE or self.launch_behavior == self.LaunchBehavior.STAY_MINIMIZED:
+                window.iconify() # minimize launcher
+            elif self.launch_behavior == self.LaunchBehavior.EXIT:
+                window.hide() # hide launcher
+
+
+            if self.launch_behavior != self.LaunchBehavior.NONE:
+                while Gtk.events_pending():
+                    Gtk.main_iteration() # wait for launcher to finish UI execution before launching
+
+        
+        # start Chocolate DOOM
+        output = subprocess.run(command, capture_output = not self.verbose)
+        if output.returncode != 0:
+            warning_message = "WARNING!: Chocolate DOOM exited with a non-zero error code (" + str(output.returncode) + ")!"
+            print(warning_message)
+            self.create_simple_message_dialog(warning_message, "Chocolate Box - Warning")
+
+
+        if window:
+            if self.launch_behavior == self.LaunchBehavior.MINIMIZE:
+                window.present() # present launcher
+            elif self.launch_behavior == self.LaunchBehavior.EXIT:
+                window.close() # exit launcher
+
+
+    # Called when the settings button is released.
+    def on_settings_button_released(self, object, data = None):
+        self.not_implemented()
+    
+    
+    # Called when the add button is released.
+    def on_add_button_released(self, object, data = None):
+        self.not_implemented()
+
+
+    # Called when the remove button is released.
+    def on_remove_button_released(self, object, data = None):
+        self.not_implemented()
+
+    
+    # Called when the about button is released.
+    def on_about_button_released(self, object, data = None):
+        self.not_implemented()
+
+
+# Start.
+if __name__ == "__main__":
+    try:
+        main = Main() # create new instance of main class
+        Gtk.main() # Initialize Gtk
+    except KeyboardInterrupt:
+        print("Quitting (user request)...")
+        sys.exit(0) # exit on KeyboardInterrupt
