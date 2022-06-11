@@ -8,6 +8,7 @@
 import enum, gi, inputs, os, subprocess, sys
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from pathlib import Path
 
 
 # Define main class.
@@ -23,7 +24,7 @@ class Main:
 
 
     # How the launcher should behave after launching.
-    launch_behavior = LaunchBehavior.NONE
+    launch_behavior = LaunchBehavior.EXIT
 
 
     # If extra information should be printed.
@@ -34,9 +35,74 @@ class Main:
     executable = "/usr/bin/chocolate-doom"
 
 
+    # The path to the Chocolate Box configuration directory.
+    config_directory = os.path.expanduser("~") + "/.config/chocolate-box"
+
+
+    # The path to the presets directory.
+    presets_directory = config_directory + "/presets"
+
+
+    # The path to the file that keeps track of the configured IWADs.
+    iwads_file = config_directory + "/iwads"
+
+
+    # The path to the current configuration file.
+    config_file = config_directory + "/chocolate-box.conf"
+
+
     # Initializes main class.
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        
+        # check launch options
+        args = sys.argv[1:]
+        for arg in args:
+            if len(arg) > 0:
+                if arg[0] == '-':
+                    # is an option
+                    if len(arg) > 1:
+                        if arg[1] == '-':
+                            # is a double dash (word) option (e.g. `--help`)
+                            if arg == "--help":
+                                self.print_help() # show help
+                                sys.exit(0)
+                            if arg == "--version":
+                                self.print_version() # show version
+                                sys.exit(0)
+                            if arg == "--verbose":
+                                print(  "WARNING!: Verbose mode is enabled!\n" +
+                                        "Extra information will be given.")
+                                self.verbose = True # enable verbose mode
+                            else:
+                                print(  "ERROR!: Invalid option (" + arg + ")!\n" +
+                                        "Use `chocolate-box --help` for more information.", ' ', '\n', file = sys.stderr)
+                                sys.exit(1) # invalid option; exit with code 1
+                        else:
+                            # is a single dash/char option (e.g. `-v`)
+                            for char in arg[1:]:
+                                if char == 'h':
+                                    self.print_help() # show help
+                                    sys.exit(0)
+                                else:
+                                    print(  "ERROR!: Invalid option (-" + char + ")!\n" +
+                                            "Use `chocolate-box --help` for more information.", ' ', '\n', file = sys.stderr)
+                                    sys.exit(1) # invalid option; exit with code 1
+                    else:
+                        print(  "ERROR!: Invalid syntax (" + arg + ")!\n" +
+                                "Use `chocolate-box --help` for more information.", ' ', '\n', file = sys.stderr)
+                        sys.exit(2) # invalid syntax (-); exit with code 2
+                else:
+                    # is not an option
+                    # this will eventually be used to select game presets by name
+                    # for now, it will just cause an error
+                    print(  "ERROR!: Invalid usage (" + arg + ")!\n" +
+                            "Use `chocolate-box --help` for more information.", ' ', '\n', file = sys.stderr)
+                    sys.exit(4) # invalid usage (not an option); exit with code 4
+            else:
+                print("ERROR!: Invalid option character length (" + arg + ")!")
+                sys.exit(3) # invalid option character length; exit with code 3
 
 
         # construct Gtk builder
@@ -46,9 +112,76 @@ class Main:
         self.builder.connect_signals(self)
 
 
+        self.update_iwad_list()
+
+
         # get and present main window
         self.window = self.builder.get_object("selection_window")
-        self.window.present()
+        self.window.show_all()
+
+
+    # Returns settings from a file as a dictionary.
+    def read_settings(self, file_path: str) -> {}:
+        settings = {}
+
+        if os.path.isfile(file_path):
+            try:
+                with open(file_path, "r") as file:
+                    for line in file.readlines():
+                        # TODO: implement
+                        pass
+            except Exception as e:
+                error_message = "ERROR!: Something happened while trying to read the settings from a file (" + file_path + ")!"
+                print(str(e) + "\n" + error_message)
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                sys.exit(5) # settings file read was interrupted; exit with code 5
+
+        return {}
+
+    
+    # Updates the list of IWADs in the selection window.
+    def update_iwad_list(self):
+        if not os.path.isfile(self.iwads_file):
+            # no IWADs file
+            iwads_path = Path(self.iwads_file) # create Path object
+            iwads_path.parent.mkdir(exist_ok = True, parents = True) # create parent directory if needed
+            iwads_path.touch() # touch file
+        else:
+            # IWADs file exists
+            listbox = self.builder.get_object("list_box") # get the ListBox widget
+            placeholder = self.builder.get_object("placeholder") # get placeholder widget
+
+            try:
+                with open(self.iwads_file, "r") as file:
+                    iwad_index = 0
+                    for iwad in file.readlines():
+                        if iwad_index == 0 and iwad != "":
+                            listbox.remove(placeholder) # remove placeholder if IWADs file is not empty
+
+                        label = Gtk.Label(label = iwad[:-1])
+
+                        listbox.add(label)
+                        iwad_index += 1
+
+            except Exception as e:
+                print(str(e) + "\nERROR!: Something happened while trying to read the file that tracks IWADs (" + self.iwads_file + ")!", ' ', '\n', file = sys.stderr)
+                sys.exit(6) # iwad file reading interrupted; exit with code 6
+
+
+    # Prints the help text.
+    def print_help(self):
+        print("\nUsage: `chocolate-box [options...]`")
+        print("\nOptions:")
+        print("  -h, --help\t\tPrints the help text.")
+        print("  --version\t\tPrints the current version.")
+        print("  --verbose\t\tPrints extra information in the terminal.\n")
+
+
+    # Prints the current version information.
+    def print_version(self):
+        print("\nChocolate Box (chocolate-box)")
+        print("Version 1.0")
+        print("Created by Nicholas Girga\n")
 
     
     # Called when the selection window is destroyed.
