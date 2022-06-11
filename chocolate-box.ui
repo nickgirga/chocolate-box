@@ -124,6 +124,7 @@
                 <property name="can-focus">True</property>
                 <property name="focus-on-click">False</property>
                 <property name="receives-default">True</property>
+                <property name="tooltip-text" translatable="yes">Launch Selected IWAD</property>
                 <signal name="released" handler="on_launch_button_released" swapped="no"/>
               </object>
               <packing>
@@ -139,6 +140,7 @@
                 <property name="can-focus">True</property>
                 <property name="focus-on-click">False</property>
                 <property name="receives-default">True</property>
+                <property name="tooltip-text" translatable="yes">Settings</property>
                 <property name="image">settings_icon</property>
                 <property name="relief">none</property>
                 <signal name="released" handler="on_settings_button_released" swapped="no"/>
@@ -155,6 +157,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <property name="tooltip-text" translatable="yes">Add IWAD</property>
                 <property name="image">add_icon</property>
                 <property name="relief">none</property>
                 <signal name="released" handler="on_add_button_released" swapped="no"/>
@@ -170,6 +173,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <property name="tooltip-text" translatable="yes">Remove Selected IWAD</property>
                 <property name="image">remove_icon</property>
                 <property name="relief">none</property>
                 <signal name="released" handler="on_remove_button_released" swapped="no"/>
@@ -202,6 +206,7 @@
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
+            <property name="tooltip-text" translatable="yes">About</property>
             <property name="image">about_icon</property>
             <signal name="released" handler="on_about_button_released" swapped="no"/>
           </object>
