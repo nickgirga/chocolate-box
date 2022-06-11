@@ -4,5 +4,4 @@
  - Create and implement settings popover
  - Implement settings
    - ...
- - Implement about page
  - Improve keyboard and controller control in the launcher
