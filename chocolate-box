@@ -51,10 +51,19 @@ class Main:
     # The path to the file that keeps track of the configured IWADs.
     iwads_file = config_directory + "/iwads"
 
+
+    # The path to the file that keeps track of the configured PWADs.
+    pwads_file = config_directory + "/pwads"
+
     
     # The paths to known IWADs.
     # This will be populated by the contents of the iwads_file when `update_iwad_list()` is called.
     iwad_paths = {}
+
+
+    # The paths to known PWADs.
+    # This will be populated by the contents of the pwads_file when `update_pwad_list()` is called.
+    pwad_paths = {}
 
 
     # The path to the current configuration file.
@@ -121,8 +130,9 @@ class Main:
         self.builder.add_from_file(self.gladefile)
         self.builder.connect_signals(self)
 
-        # update list of IWADs
+        # update selection lists
         self.iwad_paths = self.update_iwad_list()
+        self.pwad_paths = self.update_pwad_list()
 
         # get main window
         self.window = self.builder.get_object("selection_window")
@@ -158,7 +168,7 @@ class Main:
     def update_iwad_list(self) -> {}:
         if not os.path.isfile(self.iwads_file):
             # no IWADs file
-            message =   ("Chocolate Box could not find an IWADs file.\n" +
+            message = ( "Chocolate Box could not find an IWADs file.\n" +
                         "A new IWADs file will be created in the configuration directory.")
             print(message)
             self.create_simple_message_dialog(message)
@@ -191,14 +201,14 @@ class Main:
 
                         iwad_elements = iwad.split('=')
                         if len(iwad_elements) < 2:
-                            error_message =     ("ERROR!: There is a problem with your IWADs file on line " + str(iwad_index + 1) + "!\n" +
+                            error_message = (   "ERROR!: There is a problem with your IWADs file on line " + str(iwad_index + 1) + "!\n" +
                                                 "Expected to find \"=\" between two elements, but this condition was not met.")
                             print(error_message, ' ', '\n', file = sys.stderr)
                             self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
                             sys.exit(8) # only 1 element found on line; exit with code 8
 
 
-                        # create new label for the current IWAD and add it to the listbo and add it to the listboxx
+                        # create new label for the current IWAD and add it to the listbox
                         label = Gtk.Label(label = iwad_elements[0])
                         listbox.add(label)
 
@@ -220,6 +230,75 @@ class Main:
                 sys.exit(6) # iwad file reading interrupted; exit with code 6
 
             return iwad_paths # return path list
+
+
+    # Updates the list of PWADs in the selection window.
+    # Returns a dictionary of the PWAD paths.
+    def update_pwad_list(self) -> {}:
+        if not os.path.isfile(self.pwads_file):
+            # no PWADs file
+            message = ( "Chocolate Box could not find a PWADs file.\n" +
+                        "A new PWADs file will be created in the configuration directory.")
+            print(message)
+            self.create_simple_message_dialog(message)
+
+            pwads_path = Path(self.pwads_file) # create Path object
+            pwads_path.parent.mkdir(exist_ok = True, parents = True) # create parent directory if needed
+            pwads_path.write_text("[Chocolate Box PWADs]\n") # write identification line
+        else:
+            # PWADs file exists
+            listbox = self.builder.get_object("pwad_listbox") # get the ListBox widget
+            pwad_paths = {} # create path dictionary to be returned
+
+            try:
+                with open(self.pwads_file, "r") as file:
+                    pwad_index = 0
+                    for pwad in file.readlines():
+                        if pwad_index == 0 and pwad != "":
+                            if not (pwad == "[Chocolate Box PWADs]" or pwad[:-1] == "[Chocolate Box PWADs]"): # check if identification line exists
+                                print("WARNING!: Chocolate Box's PWADs file is not valid" + ((" (" + self.pwads_file + ")!") if self.verbose else "!"))
+                                self.create_simple_message_dialog("WARNING!: Chocolate Box's IWADs file is not valid!", "Chocolate Box - Warning")
+                                return {}
+                            pwad_index += 1
+                            continue # skip identification line
+                        elif pwad_index == 1 and pwad != "":
+                            for child in listbox.get_children():
+                                listbox.remove(child) # clear listbox items
+                       
+                        if pwad[len(pwad) - 1] == '\n':
+                            pwad = pwad[:-1] # remove new line
+
+                        pwad_elements = pwad.split('=')
+                        if len(pwad_elements) < 2:
+                            error_message = (   "ERROR!: There is a problem with your PWADs file on line " + str(pwad_index + 1) + "!\n" +
+                                                "Expected to find \"=\" between two elements, but this condition was not met.")
+                            print(error_message, ' ', '\n', file = sys.stderr)
+                            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                            sys.exit(8) # only 1 element found on line; exit with code 8
+
+
+                        # create new label for the current PWAD and add it to the listbox
+                        label = Gtk.Label(label = pwad_elements[0])
+                        listbox.add(label)
+
+
+                        if pwad_paths.get(pwad_elements[0], "") != "":
+                            error_message = "ERROR!: Two or more PWADs share the same name in Chocolate Box's PWADs file (" + pwad_elements[0] + ")!"
+                            print(error_message, ' ', '\n', file = sys.stderr)
+                            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                            sys.exit(9) # duplicate PWAD names: exit with code 9
+
+
+                        # add PWAD path to dictionary to be returned
+                        pwad_paths[pwad_elements[0]] = pwad_elements[1]
+                        
+                        pwad_index += 1
+
+            except Exception as e:
+                print(str(e) + "\nERROR!: Something happened while trying to read the file that tracks PWADs (" + self.pwads_file + ")!", ' ', '\n', file = sys.stderr)
+                sys.exit(10) # pwad file reading interrupted; exit with code 10
+
+            return pwad_paths # return path list
 
 
     # Prints the help text.
