@@ -110,9 +110,8 @@ class Main:
         self.builder.add_from_file(self.gladefile)
         self.builder.connect_signals(self)
 
-
+        # update list of IWADs
         self.update_iwad_list()
-
 
         # get and present main window
         self.window = self.builder.get_object("selection_window")
@@ -142,24 +141,37 @@ class Main:
     def update_iwad_list(self):
         if not os.path.isfile(self.iwads_file):
             # no IWADs file
+            message =   ("Chocolate Box could not find an IWADs file.\n" +
+                        "A new IWADs file will be created in the configuration directory.")
+            print(message)
+            self.create_simple_message_dialog(message)
+
             iwads_path = Path(self.iwads_file) # create Path object
             iwads_path.parent.mkdir(exist_ok = True, parents = True) # create parent directory if needed
-            iwads_path.touch() # touch file
+            iwads_path.write_text("[Chocolate Box IWADs]\n") # write identification line
         else:
             # IWADs file exists
             listbox = self.builder.get_object("list_box") # get the ListBox widget
-            placeholder = self.builder.get_object("placeholder") # get placeholder widget
 
             try:
                 with open(self.iwads_file, "r") as file:
                     iwad_index = 0
                     for iwad in file.readlines():
                         if iwad_index == 0 and iwad != "":
-                            listbox.remove(placeholder) # remove placeholder if IWADs file is not empty
-
+                            if not (iwad == "[Chocolate Box IWADs]" or iwad[:-1] == "[Chocolate Box IWADs]"): # check if identification line exists
+                                print("WARNING!: Chocolate Box's IWADs file is not valid" + ((" (" + self.iwads_file + ")!") if self.verbose else "!"))
+                                self.create_simple_message_dialog("WARNING!: Chocolate Box's IWADs file is not valid!", "Chocolate Box - Warning")
+                                return
+                            iwad_index += 1
+                            continue # skip identification line
+                        elif iwad_index == 1 and iwad != "":
+                            for child in listbox.get_children():
+                                listbox.remove(child) # clear listbox items
+                        
+                        # create new label for the current IWAD and add it to the listbo and add it to the listboxx
                         label = Gtk.Label(label = iwad[:-1])
-
                         listbox.add(label)
+                        
                         iwad_index += 1
 
             except Exception as e:
