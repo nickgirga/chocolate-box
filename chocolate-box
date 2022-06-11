@@ -134,9 +134,9 @@ class Main:
         self.window.show_all()
 
 
-    # Returns settings from a file as a dictionary.
-    def read_settings(self, file_path: str) -> {}:
-        settings = {}
+    # Returns properties from a config file as a dictionary.
+    def read_config(self, file_path: str) -> {}:
+        config = {}
 
         if os.path.isfile(file_path):
             try:
@@ -145,12 +145,12 @@ class Main:
                         # TODO: implement
                         pass
             except Exception as e:
-                error_message = "ERROR!: Something happened while trying to read the settings from a file (" + file_path + ")!"
+                error_message = "ERROR!: Something happened while trying to read configuration file (" + file_path + ")!"
                 print(str(e) + "\n" + error_message)
                 self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
-                sys.exit(5) # settings file read was interrupted; exit with code 5
+                sys.exit(5) # config file read was interrupted; exit with code 5
 
-        return {}
+        return config
 
     
     # Updates the list of IWADs in the selection window.
@@ -168,7 +168,7 @@ class Main:
             iwads_path.write_text("[Chocolate Box IWADs]\n") # write identification line
         else:
             # IWADs file exists
-            listbox = self.builder.get_object("list_box") # get the ListBox widget
+            listbox = self.builder.get_object("iwad_listbox") # get the ListBox widget
             iwad_paths = {} # create path dictionary to be returned
 
             try:
@@ -260,7 +260,7 @@ class Main:
 
     # Called when the launch button is released.
     def on_launch_button_released(self, object, data = None):
-        listbox = self.builder.get_object("list_box") 
+        listbox = self.builder.get_object("iwad_listbox")
         selection = listbox.get_selected_row()
         iwad_path = ""
 

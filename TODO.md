@@ -1,7 +1,9 @@
 # TODO
- - Implement add IWAD button
- - Implement remove IWAD button
+ - Implement add item button
+   - Add support for other binaries (e.g. for Heretic)
+ - Implement remove item button
  - Create and implement settings popover
  - Implement settings
    - ...
  - Improve keyboard and controller control in the launcher
+ - Implement PWADs tab

@@ -38,76 +38,174 @@
         <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkListBox" id="list_box">
+          <object class="GtkStackSwitcher">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <property name="homogeneous">True</property>
+            <property name="stack">list_stack</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkStack" id="list_stack">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="transition-type">slide-left-right</property>
             <child>
-              <object class="GtkListBoxRow" id="placeholder">
+              <object class="GtkListBox" id="iwad_listbox">
                 <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="activatable">False</property>
-                <property name="selectable">False</property>
+                <property name="can-focus">False</property>
                 <child>
-                  <object class="GtkBox">
+                  <object class="GtkListBoxRow" id="iwad_placeholder">
                     <property name="visible">True</property>
-                    <property name="can-focus">False</property>
+                    <property name="can-focus">True</property>
+                    <property name="activatable">False</property>
+                    <property name="selectable">False</property>
                     <child>
-                      <object class="GtkLabel">
+                      <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="halign">end</property>
-                        <property name="hexpand">True</property>
-                        <property name="label" translatable="yes">Please add some IWADs with the</property>
-                        <attributes>
-                          <attribute name="foreground" value="#9a9a99999696"/>
-                        </attributes>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="halign">end</property>
+                            <property name="hexpand">True</property>
+                            <property name="label" translatable="yes">Please add some IWADs with the</property>
+                            <attributes>
+                              <attribute name="foreground" value="#9a9a99999696"/>
+                            </attributes>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkImage">
+                            <property name="width-request">24</property>
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="opacity">0.50196078431372548</property>
+                            <property name="icon-name">list-add</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="hexpand">True</property>
+                            <property name="label" translatable="yes">icon</property>
+                            <attributes>
+                              <attribute name="foreground" value="#9a9a99999696"/>
+                            </attributes>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">2</property>
+                          </packing>
+                        </child>
                       </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkImage">
-                        <property name="width-request">24</property>
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="opacity">0.50196078431372548</property>
-                        <property name="icon-name">list-add</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="halign">start</property>
-                        <property name="hexpand">True</property>
-                        <property name="label" translatable="yes">icon</property>
-                        <attributes>
-                          <attribute name="foreground" value="#9a9a99999696"/>
-                        </attributes>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">2</property>
-                      </packing>
                     </child>
                   </object>
                 </child>
               </object>
+              <packing>
+                <property name="name">IWADs</property>
+                <property name="title" translatable="yes">IWADs</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkListBox" id="pwad_listbox">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="selection-mode">multiple</property>
+                <child>
+                  <object class="GtkListBoxRow" id="pwad_placeholder">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="activatable">False</property>
+                    <property name="selectable">False</property>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="halign">end</property>
+                            <property name="hexpand">True</property>
+                            <property name="label" translatable="yes">Please add some PWADs with the</property>
+                            <attributes>
+                              <attribute name="foreground" value="#9a9a99999696"/>
+                            </attributes>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkImage">
+                            <property name="width-request">24</property>
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="opacity">0.50196078431372548</property>
+                            <property name="icon-name">list-add</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="hexpand">True</property>
+                            <property name="label" translatable="yes">icon</property>
+                            <attributes>
+                              <attribute name="foreground" value="#9a9a99999696"/>
+                            </attributes>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">2</property>
+                          </packing>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="name">PWADs</property>
+                <property name="title" translatable="yes">PWADs</property>
+                <property name="position">1</property>
+              </packing>
             </child>
           </object>
           <packing>
             <property name="expand">True</property>
             <property name="fill">True</property>
-            <property name="position">0</property>
+            <property name="position">1</property>
           </packing>
         </child>
         <child>
@@ -124,7 +222,6 @@
                 <property name="can-focus">True</property>
                 <property name="focus-on-click">False</property>
                 <property name="receives-default">True</property>
-                <property name="tooltip-text" translatable="yes">Launch Selected IWAD</property>
                 <signal name="released" handler="on_launch_button_released" swapped="no"/>
               </object>
               <packing>
@@ -157,7 +254,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
-                <property name="tooltip-text" translatable="yes">Add IWAD</property>
+                <property name="tooltip-text" translatable="yes">Add Item</property>
                 <property name="image">add_icon</property>
                 <property name="relief">none</property>
                 <signal name="released" handler="on_add_button_released" swapped="no"/>
@@ -173,7 +270,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
-                <property name="tooltip-text" translatable="yes">Remove Selected IWAD</property>
+                <property name="tooltip-text" translatable="yes">Remove Selected Item</property>
                 <property name="image">remove_icon</property>
                 <property name="relief">none</property>
                 <signal name="released" handler="on_remove_button_released" swapped="no"/>
@@ -189,7 +286,7 @@
             <property name="expand">False</property>
             <property name="fill">True</property>
             <property name="padding">2</property>
-            <property name="position">1</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>
