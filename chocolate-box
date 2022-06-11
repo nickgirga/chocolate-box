@@ -45,6 +45,11 @@ class Main:
     # The path to the file that keeps track of the configured IWADs.
     iwads_file = config_directory + "/iwads"
 
+    
+    # The paths to known IWADs.
+    # This will be populated by the contents of the iwads_file when `update_iwad_list()` is called.
+    iwad_paths = {}
+
 
     # The path to the current configuration file.
     config_file = config_directory + "/chocolate-box.conf"
@@ -111,7 +116,7 @@ class Main:
         self.builder.connect_signals(self)
 
         # update list of IWADs
-        self.update_iwad_list()
+        self.iwad_paths = self.update_iwad_list()
 
         # get and present main window
         self.window = self.builder.get_object("selection_window")
@@ -138,7 +143,8 @@ class Main:
 
     
     # Updates the list of IWADs in the selection window.
-    def update_iwad_list(self):
+    # Returns a dictionary of the IWAD paths.
+    def update_iwad_list(self) -> {}:
         if not os.path.isfile(self.iwads_file):
             # no IWADs file
             message =   ("Chocolate Box could not find an IWADs file.\n" +
@@ -152,6 +158,7 @@ class Main:
         else:
             # IWADs file exists
             listbox = self.builder.get_object("list_box") # get the ListBox widget
+            iwad_paths = {} # create path dictionary to be returned
 
             try:
                 with open(self.iwads_file, "r") as file:
@@ -161,22 +168,47 @@ class Main:
                             if not (iwad == "[Chocolate Box IWADs]" or iwad[:-1] == "[Chocolate Box IWADs]"): # check if identification line exists
                                 print("WARNING!: Chocolate Box's IWADs file is not valid" + ((" (" + self.iwads_file + ")!") if self.verbose else "!"))
                                 self.create_simple_message_dialog("WARNING!: Chocolate Box's IWADs file is not valid!", "Chocolate Box - Warning")
-                                return
+                                return {}
                             iwad_index += 1
                             continue # skip identification line
                         elif iwad_index == 1 and iwad != "":
                             for child in listbox.get_children():
                                 listbox.remove(child) # clear listbox items
-                        
+                       
+                        if iwad[len(iwad) - 1] == '\n':
+                            iwad = iwad[:-1] # remove new line
+
+                        iwad_elements = iwad.split('=')
+                        if len(iwad_elements) < 2:
+                            error_message =     ("ERROR!: There is a problem with your IWADs file on line " + str(iwad_index + 1) + "!\n" +
+                                                "Expected to find \"=\" between two elements, but this condition was not met.")
+                            print(error_message, ' ', '\n', file = sys.stderr)
+                            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                            sys.exit(8) # only 1 element found on line; exit with code 8
+
+
                         # create new label for the current IWAD and add it to the listbo and add it to the listboxx
-                        label = Gtk.Label(label = iwad[:-1])
+                        label = Gtk.Label(label = iwad_elements[0])
                         listbox.add(label)
+
+
+                        if iwad_paths.get(iwad_elements[0], "") != "":
+                            error_message = "ERROR!: Two or more IWADs share the same name in Chocolate Box's IWADs file (" + iwad_elements[0] + ")!"
+                            print(error_message, ' ', '\n', file = sys.stderr)
+                            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                            sys.exit(9) # duplicate IWAD names: exit with code 9
+
+
+                        # add IWAD path to dictionary to be returned
+                        iwad_paths[iwad_elements[0]] = iwad_elements[1]
                         
                         iwad_index += 1
 
             except Exception as e:
                 print(str(e) + "\nERROR!: Something happened while trying to read the file that tracks IWADs (" + self.iwads_file + ")!", ' ', '\n', file = sys.stderr)
                 sys.exit(6) # iwad file reading interrupted; exit with code 6
+
+            return iwad_paths # return path list
 
 
     # Prints the help text.
@@ -216,7 +248,17 @@ class Main:
 
     # Called when the launch button is released.
     def on_launch_button_released(self, object, data = None):
+        listbox = self.builder.get_object("list_box") 
+        selection = listbox.get_selected_row()
+        iwad_path = ""
+
+        if selection != None:
+            selection_text = selection.get_child().get_text()
+            iwad_path = self.iwad_paths.get(selection_text, "")
+
         command = [ "/usr/bin/env", "chocolate-doom" ] # construct launch command
+        if iwad_path != "":
+            command += ["-iwad", iwad_path]
 
         window = self.builder.get_object("selection_window") # get window object
 
@@ -230,8 +272,9 @@ class Main:
             if self.launch_behavior != self.LaunchBehavior.NONE:
                 while Gtk.events_pending():
                     Gtk.main_iteration() # wait for launcher to finish UI execution before launching
-
         
+        if self.verbose:
+            print("Launching with command: " + str(command))
         # start Chocolate DOOM
         try:
             subprocess.run(command, capture_output = not self.verbose)
