@@ -478,7 +478,7 @@ class Main:
 
         # check if any elements are empty
         if iwad_name_str == "" or iwad_file_str == None or iwad_file_str == "" or exec_path_str == "":
-            message = "ERROR!: None of the IWAD elements can be left emtpy!"
+            message = "ERROR!: None of the IWAD elements can be left empty!"
             print(message, ' ', '\n', file = sys.stderr)
             self.create_simple_message_dialog(message, "Chocolate Box - Error")
             return
