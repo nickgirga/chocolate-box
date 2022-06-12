@@ -1,7 +1,7 @@
 # TODO
- - Implement add item button
-   - Add support for other binaries (e.g. for Heretic)
- - Implement remove item button
+ - Implement remove IWAD button
+ - Implement add PWAD button
+ - Implement remove PWAD button
  - Create and implement settings popover
  - Implement settings
    - ...

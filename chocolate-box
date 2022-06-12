@@ -7,8 +7,8 @@
 # Imports
 import enum, gi, inputs, os, subprocess, sys
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
-from gi.repository import GdkPixbuf
+gi.require_version('GdkPixbuf', '2.0')
+from gi.repository import GdkPixbuf, Gio, Gtk
 from pathlib import Path
 
 
@@ -59,6 +59,11 @@ class Main:
     # The paths to known IWADs.
     # This will be populated by the contents of the iwads_file when `update_iwad_list()` is called.
     iwad_paths = {}
+
+
+    # The paths to known executables for IWADs
+    # This will be populated by the contents of the iwads_file when `update_iwad_list()` is called.
+    exec_paths = {}
 
 
     # The paths to known PWADs.
@@ -131,7 +136,7 @@ class Main:
         self.builder.connect_signals(self)
 
         # update selection lists
-        self.iwad_paths = self.update_iwad_list()
+        self.update_iwad_list()
         self.pwad_paths = self.update_pwad_list()
 
         # get main window
@@ -179,7 +184,8 @@ class Main:
         else:
             # IWADs file exists
             listbox = self.builder.get_object("iwad_listbox") # get the ListBox widget
-            iwad_paths = {} # create path dictionary to be returned
+            iwad_paths = {} # create iwad path dictionary
+            exec_paths = {} # create exec path dictionary
 
             try:
                 with open(self.iwads_file, "r") as file:
@@ -199,17 +205,18 @@ class Main:
                         if iwad[len(iwad) - 1] == '\n':
                             iwad = iwad[:-1] # remove new line
 
-                        iwad_elements = iwad.split('=')
-                        if len(iwad_elements) < 2:
+                        iwad_elements = iwad.split(':')
+                        if len(iwad_elements) < 3:
                             error_message = (   "ERROR!: There is a problem with your IWADs file on line " + str(iwad_index + 1) + "!\n" +
-                                                "Expected to find \"=\" between two elements, but this condition was not met.")
+                                                "Expected to find \":\" between three elements, but this condition was not met.")
                             print(error_message, ' ', '\n', file = sys.stderr)
                             self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
-                            sys.exit(8) # only 1 element found on line; exit with code 8
+                            sys.exit(8) # less than 3 elements found on current line; exit with code 8
 
 
                         # create new label for the current IWAD and add it to the listbox
                         label = Gtk.Label(label = iwad_elements[0])
+                        label.show()
                         listbox.add(label)
 
 
@@ -220,16 +227,23 @@ class Main:
                             sys.exit(9) # duplicate IWAD names: exit with code 9
 
 
-                        # add IWAD path to dictionary to be returned
+                        # add IWAD path and exec to dictionaries
                         iwad_paths[iwad_elements[0]] = iwad_elements[1]
-                        
+                        exec_paths[iwad_elements[0]] = iwad_elements[2]
+
                         iwad_index += 1
+                    
+                    if iwad_index > 0:
+                        listbox_row = listbox.get_row_at_index(0)
+                        listbox.select_row(listbox_row)
+                        listbox_row.grab_focus()
 
             except Exception as e:
                 print(str(e) + "\nERROR!: Something happened while trying to read the file that tracks IWADs (" + self.iwads_file + ")!", ' ', '\n', file = sys.stderr)
                 sys.exit(6) # iwad file reading interrupted; exit with code 6
 
-            return iwad_paths # return path list
+            self.iwad_paths = iwad_paths # set iwad path list
+            self.exec_paths = exec_paths # set exec path list
 
 
     # Updates the list of PWADs in the selection window.
@@ -338,16 +352,23 @@ class Main:
 
 
     # Called when the launch button is released.
-    def on_launch_button_released(self, object, data = None):
+    def on_launch_button_interacted(self, object, data = None):
         listbox = self.builder.get_object("iwad_listbox")
         selection = listbox.get_selected_row()
         iwad_path = ""
+        exec_path = ""
 
         if selection != None:
             selection_text = selection.get_child().get_text()
             iwad_path = self.iwad_paths.get(selection_text, "")
+            exec_path = self.exec_paths.get(selection_text, "")
 
-        command = [ "/usr/bin/env", "chocolate-doom" ] # construct launch command
+        command = []
+        if exec_path == "":
+            command = [ "/usr/bin/env", "chocolate-doom" ] # construct launch command
+        else:
+            command = [ exec_path ]
+
         if iwad_path != "":
             command += ["-iwad", iwad_path]
 
@@ -389,7 +410,73 @@ class Main:
     
     # Called when the add button is released.
     def on_add_button_released(self, object, data = None):
-        self.not_implemented()
+        # determine if adding IWAD or PWAD
+        stack_switcher = self.builder.get_object("stack_switcher")
+        selected_stack = stack_switcher.get_stack().get_visible_child_name()
+        
+        
+        # write to file
+        if selected_stack == "IWADs":
+            # get widgets
+            add_iwad_window = self.builder.get_object("add_iwad_window")
+            iwad_name = self.builder.get_object("iwad_name")
+            iwad_file = self.builder.get_object("iwad_file")
+            
+            # reset settings
+            iwad_name.set_text("")
+            iwad_file.set_filename("")
+
+            # present window
+            add_iwad_window.show_all()
+        elif selected_stack == "PWADs":
+            self.create_simple_message_dialog("Adding PWADs is a work in progress...")
+        else:
+            sys.exit(-1) # selected stack's name is not expected; exit with code -1
+
+    
+    # Called when the IWAD add confirmation button is released.
+    def on_iwad_add_confirm_button_released(self, object, data = None):
+        # get widgets
+        window = self.builder.get_object("add_iwad_window")
+        iwad_name = self.builder.get_object("iwad_name")
+        iwad_file = self.builder.get_object("iwad_file")
+        exec_path = self.builder.get_object("exec_path")
+
+        # get information
+        iwad_name_str = iwad_name.get_text()
+        iwad_file_str = iwad_file.get_filename()
+        exec_path_str = exec_path.get_active_text()
+
+        # check if any elements are empty
+        if iwad_name_str == "" or iwad_file_str == None or iwad_file_str == "" or exec_path_str == "":
+            message = "ERROR!: None of the IWAD elements can be left emtpy!"
+            print(message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(message, "Chocolate Box - Error")
+            return
+
+        # check if any elements contain colons
+        if ":" in iwad_name_str or ":" in iwad_file_str or ":" in exec_path_str:
+            error_message = "ERROR!: None of the IWAD elements can contain \":\"!"
+            print(error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+            return
+
+        try:
+            with open(self.iwads_file, "a") as file:
+                file.write(iwad_name_str + ":" + iwad_file_str + ":" + exec_path_str + "\n") # write IWAD information
+        except Exception as e:
+            error_message = "ERROR!: Something happened while trying to append the IWAD information to the IWADs file!"
+            print(str(e) + "\n" + error_message)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+
+        self.update_iwad_list()
+        window.hide()
+
+
+    # Called when the cancel button in the add IWAD dialog is pressed.
+    def on_iwad_cancel_button_released(self, object, data = None):
+        window = self.builder.get_object("add_iwad_window")
+        window.hide()
 
 
     # Called when the remove button is released.
@@ -423,6 +510,12 @@ class Main:
         # run and destroy about dialog
         about.run()
         about.destroy()
+
+
+    # Called when the add_iwad_window is deleted.
+    def on_add_iwad_window_delete_event(self, object, data = None):
+        object.hide()
+        return True
 
 
 # Start.
