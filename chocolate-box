@@ -8,7 +8,7 @@
 import enum, gi, inputs, os, subprocess, sys
 gi.require_version('Gtk', '3.0')
 gi.require_version('GdkPixbuf', '2.0')
-from gi.repository import GdkPixbuf, Gio, GLib, Gtk
+from gi.repository import GdkPixbuf, Gio, Gtk
 from pathlib import Path
 
 
@@ -30,10 +30,6 @@ class Main:
 
     # How the launcher should behave after launching.
     launch_behavior = LaunchBehavior.EXIT
-
-
-    # How frequently to check gamepad input in milliseconds.
-    gamepad_polling_rate_ms = 100
 
 
     # If extra information should be printed.
@@ -151,24 +147,6 @@ class Main:
 
         # present main window
         self.window.show_all()
-
-        # start checking for gamepad input in Gtk's main loop
-        GLib.timeout_add(self.gamepad_polling_rate_ms, self.check_gamepad)
-
-
-    # Called in Gtk's main loop to check gamepad input and apply changes.
-    def check_gamepad(self):
-        events = [] # create empty gamepad event list
-
-        try:
-            events = inputs.get_gamepad() # get gamepad event list
-        except inputs.UnpluggedError:
-            pass # ignore unplugged device errors
-
-        for event in events:
-            print(str(event))
-        
-        return True # keep calling in Gtk's main loop
 
 
     # Returns properties from a config file as a dictionary.
