@@ -233,8 +233,8 @@ class Main:
 
                         iwad_index += 1
                     
-                    if iwad_index > 1:
-                        listbox_row = listbox.get_row_at_index(1)
+                    if iwad_index > 0:
+                        listbox_row = listbox.get_row_at_index(0)
                         if listbox_row != None:
                             listbox.select_row(listbox_row)
                             listbox_row.grab_focus()
