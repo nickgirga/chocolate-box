@@ -515,7 +515,7 @@ class Main:
 
             selection_text = selection.get_child().get_text()
         
-            if self.create_simple_message_dialog("Are you sure you want to delete the \"" + selection_text + "\" IWAD?", "Chocolate Box", True) == Gtk.ResponseType.NO:
+            if self.create_simple_message_dialog("Are you sure you want to remove the \"" + selection_text + "\" IWAD from the list?", "Chocolate Box", True) == Gtk.ResponseType.NO:
                 return
 
             lines = [] # create empty lines list to be filled
@@ -543,10 +543,10 @@ class Main:
 
             self.update_iwad_list()
 
-            self.create_simple_message_dialog("Deleted the \"" + selection_text + "\" IWAD!")
+            self.create_simple_message_dialog("Removed the \"" + selection_text + "\" IWAD from the list!")
 
         elif selected_stack == "PWADs":
-            self.create_simple_message_dialog("Deleting PWADs is a work in progress...")
+            self.create_simple_message_dialog("Removing a PWADs is a work in progress...")
         else:
             sys.exit(-1) # selected stack's name is not expected; exit with code -1
 
