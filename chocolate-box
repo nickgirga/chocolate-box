@@ -406,8 +406,35 @@ class Main:
 
     # Called when the settings button is released.
     def on_settings_button_released(self, object, data = None):
-        self.not_implemented()
-    
+        listbox = self.builder.get_object("iwad_listbox")
+        selection = listbox.get_selected_row()
+        exec_path = ""
+
+        # check if there is a selection
+        if selection != None:
+            selection_text = selection.get_child().get_text()
+            exec_path = self.exec_paths.get(selection_text, "")
+        else:
+            message = "You must select an IWAD before pressing the settings button!"
+            print(message)
+            self.create_simple_message_dialog(message)
+            return
+
+        # check if exec path could be found
+        if exec_path == "":
+            error_message = "ERROR!: Could not get executable path!"
+            print(error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+            return
+
+        # run setup
+        try:
+            subprocess.run([exec_path + "-setup"], capture_output = not self.verbose)
+        except Exception as e:
+            error_message = "ERROR!: Something happened while trying to run the setup for the selected IWAD's executable!"
+            print(str(e) + error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+
     
     # Called when the add button is released.
     def on_add_button_released(self, object, data = None):
