@@ -4,12 +4,11 @@ before_script:
   - pacman -Sy --needed --noconfirm sudo
   - useradd -m dev
   - echo "dev ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
-  - su dev
 
 stages:
   - build
 
 makepkg:
   script:
-    - makepkg --clean --rmdeps --syncdeps --noarchive --noconfirm --noprogressbar --asdeps
+    - sudo -u dev makepkg --clean --rmdeps --syncdeps --noarchive --noconfirm --noprogressbar --asdeps
   stage: build
