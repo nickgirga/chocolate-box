@@ -1,7 +1,9 @@
-image: nickgirga/arch-girga-build:latest
+image: archlinux:base-devel
 
 before_script:
-  - sudo pacman -Syu --needed --noconfirm
+  - pacman -Syu --needed --noconfirm
+  - useradd -m build
+  - echo "build ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 stages:
   - build
@@ -9,7 +11,7 @@ stages:
 makepkg:
   script:
     - cd ./PKGBUILD/
-    - makepkg --clean --rmdeps --syncdeps --noconfirm --noprogressbar
+    - sudo -u build makepkg --clean --rmdeps --syncdeps --noconfirm --noprogressbar
   artifacts:
     paths:
       - ./PKGBUILD/chocolate-box-git-*-any.pkg.tar.zst
