@@ -27,6 +27,30 @@ class Main:
     # The current version of this app.
     APP_VERSION = "1.0"
 
+    
+    # The relative path to the window icon that is not installed on the system.
+    LOCAL_ICON = "./res/icon/icon_256.png"
+
+
+    # The absolute path to the window icon that is installed on the system.
+    SYSTEM_ICON = "/usr/share/icons/chocolate-box_256.png"
+
+
+    # The relative path to the about logo that is not installed on the system.
+    LOCAL_LOGO = "./res/icon/icon_128.png"
+
+
+    # The absolute path to the about logo that is installed on the system.
+    SYSTEM_LOGO = "/usr/share/icons/chocolate-box_128.png"
+
+
+    # The relative path to the UI template that is not installed on the system.
+    LOCAL_GLADE = "./chocolate-box.ui"
+
+
+    # The absolute path to the UI template that is installed on the system.
+    SYSTEM_GLADE = "/usr/share/chocolate-box/chocolate-box.ui"
+
 
     # How the launcher should behave after launching.
     launch_behavior = LaunchBehavior.EXIT
@@ -129,22 +153,67 @@ class Main:
                 sys.exit(3) # invalid option character length; exit with code 3
 
 
-        # construct Gtk builder
-        self.gladefile = "./chocolate-box.ui"
+        # create Gtk builder
         self.builder = Gtk.Builder()
+
+
+        # determine if using local or system window icon
+        self.window_icon = ""
+        if os.path.isfile(self.LOCAL_ICON):
+            self.window_icon = self.LOCAL_ICON
+        elif os.path.isfile(self.SYSTEM_ICON):
+            self.window_icon = self.SYSTEM_ICON
+        else:
+            warning_message = "WARNING!: Could not find a window icon to use!"
+            print(warning_message)
+            self.create_simple_message_dialog(warning_message, "Chocolate Box - Warning")
+
+
+        # determine if using local or system about logo
+        self.about_logo = ""
+        if os.path.isfile(self.LOCAL_LOGO):
+            self.about_logo = self.LOCAL_LOGO
+        elif os.path.isfile(self.SYSTEM_LOGO):
+            self.about_logo = self.SYSTEM_LOGO
+        else:
+            warning_message = "WARNING!: Could not find an about logo to use!"
+            print(warning_message)
+            self.create_simple_message_dialog(warning_message, "Chocolate Box - Warning")
+
+
+        # determine if using local or system glade file
+        if os.path.isfile(self.LOCAL_GLADE):
+            self.gladefile = self.LOCAL_GLADE
+        elif os.path.isfile(self.SYSTEM_GLADE):
+            self.gladefile = self.SYSTEM_GLADE
+        else:
+            error_message = "WARNING!: Could not find the UI template!"
+            print(error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(warning_message, "Chocolate Box - Error")
+            sys.exit(11) # glade file not found; exit with code 11
+
+
+        # configure builder and connect signals
         self.builder.add_from_file(self.gladefile)
         self.builder.connect_signals(self)
+        
 
         # update selection lists
         self.update_iwad_list()
-        self.pwad_paths = self.update_pwad_list()
+        self.update_pwad_list()
 
+        
         # get main window
         self.window = self.builder.get_object("selection_window")
         
+        
         # set main window's icon
-        self.window.set_icon_from_file("./res/icon/icon_256.png")
+        if self.window_icon != "":
+            self.window.set_icon_from_file(self.window_icon)
+        else:
+            self.window.set_icon_name("window")
 
+        
         # present main window
         self.window.show_all()
 
@@ -339,9 +408,17 @@ class Main:
 
     # Will create a simple message dialog.
     def create_simple_message_dialog(self, text: str, title = "Chocolate Box", yesno = False, window = None):
+        # create dialog and give it a title
         message = Gtk.MessageDialog(parent = window, flags = 0, message_type = Gtk.MessageType.INFO, buttons = Gtk.ButtonsType.YES_NO if yesno else Gtk.ButtonsType.OK, text = text)
         message.set_title(title)
-        message.set_icon_from_file("./res/icon/icon_256.png")
+
+        #  set window icon
+        if self.window_icon != "":
+            message.set_icon_from_file(self.window_icon)
+        else:
+            message.set_icon_name("window")
+
+        # run dialog, destory it when it exits, and return the response
         response = message.run()
         message.destroy()
         return response
@@ -449,7 +526,13 @@ class Main:
             add_iwad_window = self.builder.get_object("add_iwad_window")
             iwad_name = self.builder.get_object("iwad_name")
             iwad_file = self.builder.get_object("iwad_file")
-        
+           
+            # set window icon
+            if self.window_icon != "":
+                add_iwad_window.set_icon_from_file(self.window_icon)
+            else:
+                add_iwad_window.set_icon_name("window")
+
             # reset settings
             iwad_name.set_text("")
             iwad_file.unselect_all()
@@ -595,11 +678,17 @@ class Main:
         about.set_license_type(Gtk.License.MIT_X11)
 
         # set logo in about dialog
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file("./res/icon/icon_128.png")
-        about.set_logo(pixbuf)
+        if self.about_logo != "":
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.about_logo)
+            about.set_logo(pixbuf)
+        else:
+            about.set_logo_icon_name("window")
 
         # set icon in about dialog
-        about.set_icon_from_file("./res/icon/icon_256.png")
+        if self.window_icon != "":
+            about.set_icon_from_file(self.window_icon)
+        else:
+            about.set_icon_name("window")
 
         # run and destroy about dialog
         about.run()
