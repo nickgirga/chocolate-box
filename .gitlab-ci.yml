@@ -1,9 +1,7 @@
-image: archlinux:base-devel
+image: nickgirga/arch-girga-build:latest
 
 before_script:
   - pacman -Sy --needed --noconfirm sudo
-  - useradd -m dev
-  - echo "dev ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 stages:
   - build
@@ -11,6 +9,5 @@ stages:
 makepkg:
   script:
     - cd ./PKGBUILD/
-    - su dev
-    - makepkg --clean --rmdeps --syncdeps --noarchive --noconfirm --noprogressbar --asdeps
+    - makepkg --clean --rmdeps --syncdeps --noconfirm --noprogressbar
   stage: build
