@@ -33,7 +33,7 @@ deb:
 
   script:
     - cd ./PKGBUILD/deb/
-    - sudo -u build makedeb --rm-deps --sync-deps --no-confirm
+    - makedeb --rm-deps --sync-deps --no-confirm
 
   artifacts:
     paths:
