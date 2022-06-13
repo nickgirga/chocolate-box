@@ -5,7 +5,7 @@
 
 
 # Imports
-import enum, gi, inputs, os, subprocess, sys
+import enum, gi, os, subprocess, sys
 gi.require_version('Gtk', '3.0')
 gi.require_version('GdkPixbuf', '2.0')
 from gi.repository import GdkPixbuf, Gio, Gtk
