@@ -38,6 +38,6 @@ deb:
   artifacts:
     paths:
       - ./PKGBUILD/deb/*.deb
-      expire_in: 1 week
+    expire_in: 1 week
 
   stage: deb
