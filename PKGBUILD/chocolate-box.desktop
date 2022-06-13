@@ -1,0 +1,19 @@
+[Desktop Entry]
+Comment[en_US]=
+Comment=
+Exec=chocolate-box
+GenericName[en_US]=Simple GUI for Chocolate DOOM
+GenericName=Simple GUI for Chocolate DOOM
+Icon=chocolate-box_256
+MimeType=
+Name[en_US]=Chocolate Box
+Name=Chocolate Box
+Path=
+StartupNotify=true
+Terminal=false
+TerminalOptions=
+Type=Application
+X-DBUS-ServiceName=
+X-DBUS-StartupType=
+X-KDE-SubstituteUID=false
+X-KDE-Username=
