@@ -1,10 +1,10 @@
 
 stages:
-  - arch
-  - deb
+  - arch-x86_64
+  - deb-x86_64
 
 
-arch:
+arch-x86_64:
   image: archlinux:base-devel
 
   before_script:
@@ -21,10 +21,10 @@ arch:
       - ./PKGBUILD/arch/*.pkg.tar.zst
     expire_in: 1 week
   
-  stage: arch
+  stage: arch-x86_64
 
 
-deb:
+deb-x86_64:
   image: proget.hunterwittenborn.com/docker/makedeb/ci-image:stable
   
   before_script:
@@ -40,4 +40,4 @@ deb:
       - ./PKGBUILD/deb/*.deb
     expire_in: 1 week
 
-  stage: deb
+  stage: deb-x86_64
