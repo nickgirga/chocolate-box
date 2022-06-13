@@ -1,6 +1,6 @@
 # Maintainer: Nicholas Girga <contact@nickgirga.com>
 pkgname=chocolate-box-git
-pkgver=1.694d3a7
+pkgver=1.3f79db1
 pkgrel=1
 pkgdesc="Simple GUI for Chocolate DOOM"
 arch=('any')
