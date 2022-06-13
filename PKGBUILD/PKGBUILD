@@ -1,0 +1,38 @@
+# Maintainer: Nicholas Girga <contact@nickgirga.com>
+pkgname=chocolate-box-git
+pkgver=r27.5a46f79
+pkgrel=1
+pkgdesc="Simple GUI for Chocolate DOOM"
+arch=('any')
+url="https://gitlab.com/nickgirga/chocolate-box"
+license=('MIT')
+groups=()
+depends=('python'
+ 	 'gtk3'
+ 	 'python-gobject'
+ 	 'chocolate-doom')
+makedepends=('git')
+optdepends=('freedoom')
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("$pkgname::git+https://gitlab.com/nickgirga/chocolate-box.git")
+noextract=()
+md5sums=('SKIP') #autofill using updpkgsums
+
+pkgver() {
+	cd "$srcdir/$pkgname"
+	printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+package() {
+	cd "$srcdir/$pkgname"
+	install -Dm755 ./chocolate-box "$pkgdir/usr/bin/chocolate-box"
+	install -Dm644 ./chocolate-box.ui "$pkgdir/usr/share/chocolate-box/chocolate-box.ui"
+	install -Dm644 ./res/icon/icon_128.png "$pkgdir/usr/share/icons/chocolate-box_128.png"
+	install -Dm644 ./res/icon/icon_256.png "$pkgdir/usr/share/icons/chocolate-box_256.png"
+}
