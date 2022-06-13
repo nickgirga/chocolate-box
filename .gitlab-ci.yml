@@ -1,7 +1,10 @@
 image: archlinux:latest
 
 before_script:
-  - pacman -Su pkgbuild-introspection --noconfirm
+  - pacman -Sy --needed --noconfirm sudo
+  - useradd -m dev
+  - echo "dev ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
+  - su dev
 
 stages:
   - build
