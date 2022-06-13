@@ -28,8 +28,8 @@ deb:
   image: proget.hunterwittenborn.com/docker/makedeb/ci-image:stable
   
   before_script:
-    - apt-get update -y
-    - apt-get upgrade -y
+    - sudo apt-get update -y
+    - sudo apt-get upgrade -y
 
   script:
     - cd ./PKGBUILD/deb/
