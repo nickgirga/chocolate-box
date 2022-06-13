@@ -22,7 +22,7 @@ install=
 changelog=
 source=("$pkgname::git+https://gitlab.com/nickgirga/chocolate-box.git")
 noextract=()
-md5sums=('SKIP') #autofill using updpkgsums
+md5sums=('SKIP')
 
 pkgver() {
 	cd "$srcdir/$pkgname"
