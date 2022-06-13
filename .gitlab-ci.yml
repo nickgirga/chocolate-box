@@ -1,19 +1,43 @@
-image: archlinux:base-devel
-
-before_script:
-  - pacman -Syu --needed --noconfirm
-  - useradd -m build
-  - echo "build ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 stages:
-  - build
+  - arch
+  - deb
 
-arch-linux:
+
+arch:
+  image: archlinux:base-devel
+
+  before_script:
+    - pacman -Syu --needed --noconfirm
+    - useradd -m build
+    - echo "build ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
+
   script:
-    - cd ./PKGBUILD/Arch/
+    - cd ./PKGBUILD/arch/
     - sudo -u build makepkg --clean --rmdeps --syncdeps --noconfirm --noprogressbar
+  
   artifacts:
     paths:
-      - ./PKGBUILD/Arch/*.pkg.tar.zst
+      - ./PKGBUILD/arch/*.pkg.tar.zst
     expire_in: 1 week
-  stage: build
+  
+  stage: arch
+
+
+deb:
+  image: proget.hunterwittenborn.com/docker/makedeb/ci-image:stable
+  
+  before_script:
+    - apt-get update -y
+    - apt-get upgrade -y
+
+  script:
+    - cd ./PKGBUILD/deb/
+    - sudo -u build makedeb --rm-deps --sync-deps --no-confirm
+
+  artifacts:
+    paths:
+      - ./PKGBUILD/deb/*.deb
+      expire_in: 1 week
+
+  stage: deb
