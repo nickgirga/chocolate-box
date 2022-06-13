@@ -12,6 +12,6 @@ makepkg:
     - makepkg --clean --rmdeps --syncdeps --noconfirm --noprogressbar
   artifacts:
     paths:
-      - chocolate-box-git-*-any.pkg.tar.zst
+      - ./PKGBUILD/chocolate-box-git-*-any.pkg.tar.zst
     expire_in: 1 week
   stage: build
