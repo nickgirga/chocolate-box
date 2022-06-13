@@ -1,7 +1,7 @@
 image: nickgirga/arch-girga-build:latest
 
 before_script:
-  - pacman -Sy --needed --noconfirm sudo
+  - sudo pacman -Sy --needed --noconfirm sudo
 
 stages:
   - build
