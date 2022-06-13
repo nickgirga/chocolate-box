@@ -11,5 +11,6 @@ stages:
 makepkg:
   script:
     - cd ./PKGBUILD/
-    - sudo -u dev makepkg --clean --rmdeps --syncdeps --noarchive --noconfirm --noprogressbar --asdeps
+    - su dev
+    - makepkg --clean --rmdeps --syncdeps --noarchive --noconfirm --noprogressbar --asdeps
   stage: build
