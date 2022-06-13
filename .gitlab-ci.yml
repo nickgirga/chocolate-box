@@ -1,4 +1,4 @@
-image: archlinux:latest
+image: archlinux:base-devel
 
 before_script:
   - pacman -Sy --needed --noconfirm sudo
