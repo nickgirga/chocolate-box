@@ -8,12 +8,12 @@ before_script:
 stages:
   - build
 
-makepkg:
+arch-linux:
   script:
-    - cd ./PKGBUILD/
+    - cd ./PKGBUILD/Arch/
     - sudo -u build makepkg --clean --rmdeps --syncdeps --noconfirm --noprogressbar
   artifacts:
     paths:
-      - ./PKGBUILD/chocolate-box-git-*-any.pkg.tar.zst
+      - ./PKGBUILD/Arch/*.pkg.tar.zst
     expire_in: 1 week
   stage: build

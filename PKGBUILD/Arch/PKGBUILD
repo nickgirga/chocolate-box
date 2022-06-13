@@ -1,6 +1,6 @@
 # Maintainer: Nicholas Girga <contact@nickgirga.com>
 pkgname=chocolate-box-git
-pkgver=r43.cd1a8c6
+pkgver=r44.df6e037
 pkgrel=1
 pkgdesc="Simple GUI for Chocolate DOOM"
 arch=('any')
@@ -34,5 +34,5 @@ package() {
 	install -Dm644 ./chocolate-box.ui "$pkgdir/usr/share/chocolate-box/chocolate-box.ui"
 	install -Dm644 ./res/icon/icon_128.png "$pkgdir/usr/share/icons/chocolate-box_128.png"
 	install -Dm644 ./res/icon/icon_256.png "$pkgdir/usr/share/icons/chocolate-box_256.png"
-	install -Dm644 ./PKGBUILD/chocolate-box.desktop "$pkgdir/usr/share/applications/chocolate-box.desktop"
+	install -Dm644 ./chocolate-box.desktop "$pkgdir/usr/share/applications/chocolate-box.desktop"
 }
