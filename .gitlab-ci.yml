@@ -35,6 +35,7 @@ debian:latest-x86_64:
   before_script:
     - sudo apt-get update -y
     - sudo apt-get upgrade -y
+    - sudo apt-get install -y git
 
   script:
     - cd ./PKGBUILD/Debian/
@@ -58,6 +59,7 @@ ubuntu:latest-x86_64:
   before_script:
     - sudo apt-get update -y
     - sudo apt-get upgrade -y
+    - sudo apt-get install -y git
 
   script:
     - cd ./PKGBUILD/Ubuntu/
