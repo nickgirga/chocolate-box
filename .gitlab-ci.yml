@@ -1,10 +1,11 @@
-
 stages:
-  - arch-x86_64
-  - deb-x86_64
+  - archlinux:base-devel-x86_64
+  - debian:latest-x86_64
+  - ubuntu:latest-x86_64
 
 
-arch-x86_64:
+# Build a package using the latest base-devel Docker image for Arch with `makepkg`
+archlinux:base-devel-x86_64:
   image: archlinux:base-devel
 
   before_script:
@@ -13,7 +14,7 @@ arch-x86_64:
     - echo "build ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
 
   script:
-    - cd ./PKGBUILD/arch/
+    - cd ./PKGBUILD/Arch/
     - sudo -u build makepkg --clean --rmdeps --syncdeps --noconfirm --noprogressbar
 
   only:
@@ -21,21 +22,22 @@ arch-x86_64:
   
   artifacts:
     paths:
-      - ./PKGBUILD/arch/*.pkg.tar.zst
+      - ./PKGBUILD/Arch/*.pkg.tar.zst
     expire_in: 1 week
   
-  stage: arch-x86_64
+  stage: archlinux:base-devel-x86_64
 
 
-deb-x86_64:
-  image: proget.hunterwittenborn.com/docker/makedeb/ci-image:stable
+# Build a package using the latest Docker image for Debian with `makedeb`
+debian:latest-x86_64:
+  image: proget.makedeb.org/docker/makedeb/makedeb-beta:debian-latest
   
   before_script:
     - sudo apt-get update -y
     - sudo apt-get upgrade -y
 
   script:
-    - cd ./PKGBUILD/deb/
+    - cd ./PKGBUILD/Debian/
     - makedeb --rm-deps --sync-deps --no-confirm
 
   only:
@@ -43,7 +45,30 @@ deb-x86_64:
 
   artifacts:
     paths:
-      - ./PKGBUILD/deb/*.deb
+      - ./PKGBUILD/Debian/*.deb
     expire_in: 1 week
 
-  stage: deb-x86_64
+  stage: debian:latest-x86_64
+
+
+# Build a package using the latest Docker image for Ubuntu with `makedeb`
+ubuntu:latest-x86_64:
+  image: proget.makedeb.org/docker/makedeb/makedeb-beta:ubuntu-latest
+  
+  before_script:
+    - sudo apt-get update -y
+    - sudo apt-get upgrade -y
+
+  script:
+    - cd ./PKGBUILD/Ubuntu/
+    - makedeb --rm-deps --sync-deps --no-confirm
+
+  only:
+    - milk
+
+  artifacts:
+    paths:
+      - ./PKGBUILD/Ubuntu/*.deb
+    expire_in: 1 week
+
+  stage: ubuntu:latest-x86_64
