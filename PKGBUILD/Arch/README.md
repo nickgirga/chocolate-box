@@ -5,9 +5,9 @@ It provides your package manager with information such as which dependencies to 
 This makes it easier for others to contribute to the packaging part of a project and it also makes it easier to audit unofficial apps before installing them, as you can see exactly how it was constructed and follow any source links to ensure it doesn't download anything strange.
 
 #### [Easy] How do I use it?
-These `PKGBUILD` files actually only exist because they're used for automatic packaging using GitLab CI. After every commit to the "[milk]()" branch, a new package will be created and uploaded to GitLab for users to download. So you don't need to do anything!
+These `PKGBUILD` files actually only exist because they're used for automatic packaging using GitLab CI. After every commit to the "[milk](https://gitlab.com/nickgirga/chocolate-box/-/tree/milk)" branch, a new package will be created and uploaded to GitLab for users to download. So you don't need to do anything!
 
-You can download these bleeding edge packages [here](). Then, if you use a GUI package manager, you should be able to just open the file (double click) and press install. If you prefer the command line interface, you can use the following command:
+You can download these bleeding edge packages [here](https://gitlab.com/nickgirga/chocolate-box/-/pipelines). Then, if you use a GUI package manager, you should be able to just open the file (double click) and press install. If you prefer the command line interface, you can use the following command:
 
 ```
 pacman -U [package_name].pkg.tar.zst
@@ -17,14 +17,14 @@ pacman -U [package_name].pkg.tar.zst
 
 ***Done!*** You can now launch Chocolate Box from the icon in the launcher or with the `chocolate-box` command!
 
-Optionally, you can build this package yourself. If the provided package is not working for you, building it yourself may help. For example, currently only x86_64 packages are being provided, so users with ARM-based machines will need to repackage it themselves. For more information, see the [How do I build it myself?]() section. ***Note: most users will not have to do this.***
+Optionally, you can build this package yourself. If the provided package is not working for you, building it yourself may help. For example, currently only x86_64 packages are being provided, so users with ARM-based machines will need to repackage it themselves. For more information, see the [How do I build it myself?](#advanced-how-do-i-build-it-myself) section. ***Note: most users will not have to do this.***
 
 #### [Advanced] How do I build it myself?
 ***WARNING!: Only proceed if you are familiar with build automation tools!***
 
-The `makepkg` utility comes with the `pacman` package. So if your Arch Linux environment is using `pacman` to manage packages (it probably is), then it probably already has what we need.
+The `makepkg` utility comes with the `pacman` package. So, if your Arch Linux environment is using `pacman` to manage packages (it probably is), then it probably already has what we need.
 
-Simply navigate to the directory that contains the `PKGBUILD` file and run `makepkg -s`. This will just install the needed dependencies and build the package. You can install it as you would a distributed package (as described in the [How do I use it?]() section) or you can automatically install it after it finishes building by giving `makepkg` an additional `-i` option (e.g. `makepkg -si`).
+Simply navigate to the directory that contains the `PKGBUILD` file and run `makepkg -s`. This will just install the needed dependencies and build the package. You can install it as you would a distributed package (as described in the [How do I use it?](#easy-how-do-i-use-it) section) or you can automatically install it after it finishes building by giving `makepkg` an additional `-i` option (e.g. `makepkg -si`).
 
 ***Done!*** You can now launch Chocolate Box from the icon in the launcher or with the `chocolate-box` command!
 
