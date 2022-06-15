@@ -10,7 +10,7 @@ groups=()
 depends=('python'
  	 'gtk3'
  	 'python-gobject'
- 	 'chocolate-doom')
+	 'chocolate-doom')
 makedepends=('git')
 optdepends=('freedoom')
 provides=()

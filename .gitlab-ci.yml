@@ -6,20 +6,15 @@ stages:
 
 # Build a package using the latest base-devel Docker image for Arch with `makepkg`
 archlinux:base-devel-x86_64:
-  image: archlinux:base-devel
+  image: nickgirga/aur-girga-build
 
   before_script:
-    - pacman -Syu --needed --noconfirm git
-    - useradd -m build
-    - echo "build ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
+    - sudo pacman -Syu --needed --noconfirm
 
   script:
-    - git clone https://aur.archlinux.org/chocolate-doom.git
-    - cd ./chocolate-doom/
+    - cd ./PKGBUILD/Arch/
     - sudo chown -R build .
-    - sudo -u build makepkg --syncdeps --install --noconfirm --noprogressbar --asdeps
-    - cd ../PKGBUILD/Arch/
-    - sudo -u build makepkg --syncdeps --noconfirm --noprogressbar
+    - PACMAN=yay makepkg --syncdeps --noconfirm --noprogressbar
 
   only:
     - milk
