@@ -9,8 +9,7 @@ license=('MIT')
 groups=()
 depends=('python'
  	 'gtk3'
- 	 'python-gobject'
-	 'chocolate-doom')
+ 	 'python-gobject')
 makedepends=('git')
 optdepends=('freedoom')
 provides=()
