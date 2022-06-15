@@ -17,7 +17,7 @@ archlinux:base-devel-x86_64:
     - git clone https://aur.archlinux.org/chocolate-doom.git
     - cd ./chocolate-doom/
     - sudo chown -R build .
-    - sudo -u build makepkg --syncdeps --install --noconfirm --noprogressbar --asdeps
+    - sudo -u build makepkg --syncdeps --install --noconfirm --noprogressbar --asdeps --skippgpcheck
     - cd ../PKGBUILD/Arch/
     - sudo -u build makepkg --syncdeps --noconfirm --noprogressbar
 
