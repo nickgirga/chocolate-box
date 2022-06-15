@@ -14,7 +14,10 @@ archlinux:base-devel-x86_64:
     - echo "build ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
 
   script:
-    - cd ./PKGBUILD/Arch/
+    - git clone https://aur.archlinux.org/chocolate-doom.git
+    - cd ./chocolate-doom/
+    - sudo -u build makepkg --syncdeps --install --noconfirm --noprogressbar --asdeps
+    - cd ../PKGBUILD/Arch/
     - sudo -u build makepkg --syncdeps --noconfirm --noprogressbar
 
   only:
