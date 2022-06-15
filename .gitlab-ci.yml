@@ -13,7 +13,7 @@ archlinux:base-devel-x86_64:
 
   script:
     - cd ./PKGBUILD/Arch/
-    - makepkg --syncdeps --noconfirm --noprogressbar
+    - PACMAN=yay makepkg --syncdeps --noconfirm --noprogressbar
 
   only:
     - milk
