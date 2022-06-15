@@ -12,7 +12,15 @@ depends=('python'
  	 'python-gobject'
  	 'chocolate-doom')
 makedepends=('git')
-optdepends=('freedoom')
+optdepends=('crispy-doom'
+	    'zdoom'
+	    'gzdoom'
+	    'freedm'
+	    'freedoom1'
+	    'freedoom2'
+	    'doom1-wad'
+	    'heretic1-wad'
+	    'hexen1-wad')
 provides=()
 conflicts=()
 replaces=()
