@@ -6,12 +6,10 @@ stages:
 
 # Build a package using the latest base-devel Docker image for Arch with `makepkg`
 archlinux:base-devel-x86_64:
-  image: archlinux:base-devel
+  image: nickgirga/aur-girga-build
 
   before_script:
     - pacman -Syu --needed --noconfirm
-    - useradd -m build
-    - echo "build ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
 
   script:
     - cd ./PKGBUILD/Arch/
