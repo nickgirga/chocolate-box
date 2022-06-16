@@ -769,7 +769,7 @@ class Main:
 
     # Called when a key is pressed with the selection window active.
     def on_selection_window_key_press_event(self, object, event):
-        # 
+        # shift selected item up/down if holding shift while pressing arrow keys
         if event.state == Gdk.ModifierType.SHIFT_MASK:
             if event.keyval == Gdk.KEY_Up:
                 # TODO: implement shift selected item up
