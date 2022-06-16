@@ -429,8 +429,8 @@ class Main:
         self.create_simple_message_dialog("This feature has not been implemented yet!", "Chocolate Box - Error")
 
 
-    # Called when the launch button is interacted with.
-    def on_launch_button_interacted(self, object, data = None):
+    # Called when the launch button is clicked.
+    def on_launch_button_clicked(self, object, data = None):
         listbox = self.builder.get_object("iwad_listbox")
         selection = listbox.get_selected_row()
         iwad_path = ""
@@ -481,8 +481,8 @@ class Main:
                 window.close() # exit launcher
 
 
-    # Called when the settings button is released.
-    def on_settings_button_released(self, object, data = None):
+    # Called when the settings button is clicked.
+    def on_settings_button_clicked(self, object, data = None):
         listbox = self.builder.get_object("iwad_listbox")
         selection = listbox.get_selected_row()
         exec_path = ""
@@ -513,14 +513,14 @@ class Main:
             self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
 
     
-    # Called when the add button is released.
-    def on_add_button_released(self, object, data = None):
+    # Called when the add button is clicked.
+    def on_add_button_clicked(self, object, data = None):
         # determine if adding IWAD or PWAD
         stack_switcher = self.builder.get_object("stack_switcher")
         selected_stack = stack_switcher.get_stack().get_visible_child_name()
         
         
-        # write to file
+        # show the right add window for the selected tab
         if selected_stack == "IWADs":
             # get widgets
             add_iwad_window = self.builder.get_object("add_iwad_window")
@@ -536,77 +536,39 @@ class Main:
             # reset settings
             iwad_name.set_text("")
             iwad_file.unselect_all()
+            iwad_file.set_filename("")
 
             # present window
             add_iwad_window.show_all()
         
         elif selected_stack == "PWADs":
-            self.create_simple_message_dialog("Adding PWADs is a work in progress...")
+            # get widgets
+            add_pwad_window = self.builder.get_object("add_pwad_window")
+            pwad_name = self.builder.get_object("pwad_name")
+            pwad_file = self.builder.get_object("pwad_file")
+            pwad_method = self.builder.get_object("pwad_method")
+
+            # set window icon
+            if self.window_icon != "":
+                add_pwad_window.set_icon_from_file(self.window_icon)
+            else:
+                add_pwad_window.set_icon_name("window")
+
+            # reset settings
+            pwad_name.set_text("")
+            pwad_file.unselect_all()
+            pwad_file.set_filename("")
+            pwad_method.set_active(0)
+        
+            # present window
+            add_pwad_window.show_all()
+
         else:
             sys.exit(-1) # selected stack's name is not expected; exit with code -1
 
-    
-    # Called when the IWAD add confirmation button is released.
-    def on_iwad_add_confirm_button_released(self, object, data = None):
-        # get widgets
-        window = self.builder.get_object("add_iwad_window")
-        iwad_name = self.builder.get_object("iwad_name")
-        iwad_file = self.builder.get_object("iwad_file")
-        exec_path = self.builder.get_object("exec_path")
 
-        # get information
-        iwad_name_str = iwad_name.get_text()
-        iwad_file_str = iwad_file.get_filename()
-        exec_path_str = exec_path.get_active_text()
-
-        # check if any elements are empty
-        if iwad_name_str == "" or iwad_file_str == None or iwad_file_str == "" or exec_path_str == "":
-            message = "ERROR!: None of the IWAD elements can be left empty!"
-            print(message, ' ', '\n', file = sys.stderr)
-            self.create_simple_message_dialog(message, "Chocolate Box - Error")
-            return
-
-        # check if any elements contain colons
-        if ":" in iwad_name_str or ":" in iwad_file_str or ":" in exec_path_str:
-            error_message = "ERROR!: None of the IWAD elements can contain \":\"!"
-            print(error_message, ' ', '\n', file = sys.stderr)
-            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
-            return
-
-        try:
-            with open(self.iwads_file, "r") as file:
-                for line in file.readlines():
-                    if line[:len(iwad_name_str)] == iwad_name_str:
-                        message = "An IWAD with the specified name already exists!"
-                        print(message)
-                        self.create_simple_message_dialog(message)
-                        return
-        except Exception as e:
-            error_message = "ERROR!: Something happened while trying to check the IWADs file for duplicate names!"
-            print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
-            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
-            return
-
-        try:
-            with open(self.iwads_file, "a") as file:
-                file.write(iwad_name_str + ":" + iwad_file_str + ":" + exec_path_str + "\n") # write IWAD information
-        except Exception as e:
-            error_message = "ERROR!: Something happened while trying to append the IWAD information to the IWADs file!"
-            print(str(e) + "\n" + error_message)
-            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
-
-        self.update_iwad_list()
-        window.hide()
-
-
-    # Called when the cancel button in the add IWAD dialog is pressed.
-    def on_iwad_cancel_button_released(self, object, data = None):
-        window = self.builder.get_object("add_iwad_window")
-        window.hide()
-
-
-    # Called when the remove button is released.
-    def on_remove_button_released(self, object, data = None):
+    # Called when the remove button is clicked.
+    def on_remove_button_clicked(self, object, data = None):
         # determine if removing IWAD or PWAD
         stack_switcher = self.builder.get_object("stack_switcher")
         selected_stack = stack_switcher.get_stack().get_visible_child_name()
@@ -660,9 +622,96 @@ class Main:
         else:
             sys.exit(-1) # selected stack's name is not expected; exit with code -1
 
+
+    # Called when the move up button is clicked.
+    def on_move_up_button_clicked(self, object, data = None):
+        # TODO: implement
+        self.not_implemented()
+
+
+    # Called when the move down button is clicked.
+    def on_move_down_button_clicked(self, object, data = None):
+        # TODO: implement
+        self.not_implemented()
+
+
+    # Called when the IWAD add confirmation button is clicked.
+    def on_iwad_add_confirm_button_clicked(self, object, data = None):
+        # get widgets
+        window = self.builder.get_object("add_iwad_window")
+        iwad_name = self.builder.get_object("iwad_name")
+        iwad_file = self.builder.get_object("iwad_file")
+        exec_path = self.builder.get_object("exec_path")
+
+        # get information
+        iwad_name_str = iwad_name.get_text()
+        iwad_file_str = iwad_file.get_filename()
+        exec_path_str = exec_path.get_active_text()
+
+        # check if any elements are empty
+        if iwad_name_str == "" or iwad_file_str == None or iwad_file_str == "" or exec_path_str == "":
+            message = "ERROR!: None of the IWAD elements can be left empty!"
+            print(message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(message, "Chocolate Box - Error")
+            return
+
+        # check if any elements contain colons
+        if ":" in iwad_name_str or ":" in iwad_file_str or ":" in exec_path_str:
+            error_message = "ERROR!: None of the IWAD elements can contain \":\"!"
+            print(error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+            return
+
+        try:
+            with open(self.iwads_file, "r") as file:
+                for line in file.readlines():
+                    if line[:len(iwad_name_str)] == iwad_name_str:
+                        message = "An IWAD with the specified name already exists!"
+                        print(message)
+                        self.create_simple_message_dialog(message)
+                        return
+        except Exception as e:
+            error_message = "ERROR!: Something happened while trying to check the IWADs file for duplicate names!"
+            print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+            return
+
+        try:
+            with open(self.iwads_file, "a") as file:
+                file.write(iwad_name_str + ":" + iwad_file_str + ":" + exec_path_str + "\n") # write IWAD information
+        except Exception as e:
+            error_message = "ERROR!: Something happened while trying to append the IWAD information to the IWADs file!"
+            print(str(e) + "\n" + error_message)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+
+        self.update_iwad_list()
+        window.hide()
+
+
+    # Called when the cancel button in the add IWAD dialog is pressed.
+    def on_iwad_cancel_button_clicked(self, object, data = None):
+        window = self.builder.get_object("add_iwad_window")
+        window.hide()
+
+
+    # Called when the PWAD add confirmation button is clicked.
+    def on_pwad_add_confirm_button_clicked(self, object, data = None):
+        # get widgets
+        window = self.builder.get_object("add_pwad_window")
+
+        self.create_simple_message_dialog("... Pretend I added something. This feature is still in progress!")
+
+        window.hide()
+
     
-    # Called when the about button is released.
-    def on_about_button_released(self, object, data = None):
+    # Called when the cancel button in the add PWAD dialog is pressed.
+    def on_pwad_cancel_button_clicked(self, object, data = None):
+        window = self.builder.get_object("add_pwad_window")
+        window.hide()
+
+    
+    # Called when the about button is clicked.
+    def on_about_button_clicked(self, object, data = None):
         # create about dialog
         about = Gtk.AboutDialog()
 
@@ -697,6 +746,12 @@ class Main:
 
     # Called when add_iwad_window is deleted.
     def on_add_iwad_window_delete_event(self, object, data = None):
+        object.hide()
+        return True
+
+
+    # Called when add_pwad_window is deleted.
+    def on_add_pwad_window_delete_event(self, object, data = None):
         object.hide()
         return True
 

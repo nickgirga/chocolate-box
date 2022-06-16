@@ -12,19 +12,9 @@
     <property name="can-focus">False</property>
     <property name="icon-name">list-add</property>
   </object>
-  <object class="GtkFileFilter" id="doom_wad_file_filter">
-    <patterns>
-      <pattern>*.wad</pattern>
-      <pattern>*.WAD</pattern>
-      <pattern>*.pk3</pattern>
-      <pattern>*.PK3</pattern>
-    </patterns>
-  </object>
-  <object class="GtkDialog" id="add_iwad_window">
-    <property name="width-request">290</property>
-    <property name="height-request">145</property>
+  <object class="GtkDialog" id="add_pwad_window">
     <property name="can-focus">False</property>
-    <property name="title" translatable="yes">Chocolate Box - Add an IWAD</property>
+    <property name="title" translatable="yes">Chocolate Box - Add a PWAD</property>
     <property name="modal">True</property>
     <property name="window-position">center</property>
     <property name="default-width">480</property>
@@ -33,19 +23,19 @@
     <property name="type-hint">dialog</property>
     <property name="skip-taskbar-hint">True</property>
     <property name="urgency-hint">True</property>
-    <signal name="delete-event" handler="on_add_iwad_window_delete_event" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox">
+        <property name="width-request">290</property>
+        <property name="height-request">135</property>
         <property name="can-focus">False</property>
-        <property name="margin-start">12</property>
-        <property name="margin-end">12</property>
-        <property name="margin-top">6</property>
-        <property name="margin-bottom">6</property>
         <property name="orientation">vertical</property>
         <property name="spacing">8</property>
         <child internal-child="action_area">
           <object class="GtkButtonBox">
             <property name="can-focus">False</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-bottom">6</property>
             <property name="layout-style">end</property>
             <child>
               <object class="GtkButton">
@@ -53,7 +43,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
-                <signal name="released" handler="on_iwad_cancel_button_released" swapped="no"/>
+                <signal name="clicked" handler="on_pwad_cancel_button_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -64,14 +54,12 @@
             <child>
               <object class="GtkButton">
                 <property name="label" translatable="yes">Add</property>
-                <property name="width-request">0</property>
-                <property name="height-request">0</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="can-default">True</property>
                 <property name="has-default">True</property>
                 <property name="receives-default">True</property>
-                <signal name="released" handler="on_iwad_add_confirm_button_released" swapped="no"/>
+                <signal name="clicked" handler="on_pwad_add_confirm_button_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -90,6 +78,217 @@
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">6</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">4</property>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="spacing">6</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Name:</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="pwad_name">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="hexpand">True</property>
+                    <property name="placeholder-text" translatable="yes">PWAD Name</property>
+                    <property name="input-hints">GTK_INPUT_HINT_EMOJI | GTK_INPUT_HINT_NONE</property>
+                    <signal name="activate" handler="on_pwad_add_confirm_button_clicked" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="spacing">6</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">File:</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkFileChooserButton" id="pwad_file">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="focus-on-click">False</property>
+                    <property name="filter">doom_wad_file_filter</property>
+                    <property name="title" translatable="yes">Chocolate Box - Choose an IWAD File</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="spacing">6</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Method:</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="pwad_method">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="active">0</property>
+                    <items>
+                      <item id="file" translatable="yes">File/Add</item>
+                      <item id="merge" translatable="yes">Merge</item>
+                    </items>
+                    <signal name="delete-event" handler="on_add_pwad_window_delete_event" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkFileFilter" id="doom_wad_file_filter">
+    <patterns>
+      <pattern>*.wad</pattern>
+      <pattern>*.WAD</pattern>
+      <pattern>*.pk3</pattern>
+      <pattern>*.PK3</pattern>
+    </patterns>
+  </object>
+  <object class="GtkDialog" id="add_iwad_window">
+    <property name="can-focus">False</property>
+    <property name="title" translatable="yes">Chocolate Box - Add an IWAD</property>
+    <property name="modal">True</property>
+    <property name="window-position">center</property>
+    <property name="default-width">480</property>
+    <property name="default-height">145</property>
+    <property name="destroy-with-parent">True</property>
+    <property name="type-hint">dialog</property>
+    <property name="skip-taskbar-hint">True</property>
+    <property name="urgency-hint">True</property>
+    <signal name="delete-event" handler="on_add_iwad_window_delete_event" swapped="no"/>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="width-request">290</property>
+        <property name="height-request">135</property>
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">8</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can-focus">False</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-bottom">6</property>
+            <property name="layout-style">end</property>
+            <child>
+              <object class="GtkButton">
+                <property name="label" translatable="yes">Cancel</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_iwad_cancel_button_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton">
+                <property name="label" translatable="yes">Add</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="can-default">True</property>
+                <property name="has-default">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_iwad_add_confirm_button_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">6</property>
             <property name="orientation">vertical</property>
             <property name="spacing">4</property>
             <child>
@@ -114,6 +313,9 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="hexpand">True</property>
+                    <property name="placeholder-text" translatable="yes">IWAD Name</property>
+                    <property name="input-hints">GTK_INPUT_HINT_EMOJI | GTK_INPUT_HINT_NONE</property>
+                    <signal name="activate" handler="on_iwad_add_confirm_button_clicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -194,10 +396,16 @@
                       <item translatable="yes">chocolate-heretic</item>
                       <item translatable="yes">chocolate-hexen</item>
                       <item translatable="yes">chocolate-strife</item>
+                      <item translatable="yes">crispy-doom</item>
+                      <item translatable="yes">crispy-heretic</item>
+                      <item translatable="yes">crispy-hexen</item>
+                      <item translatable="yes">gzdoom</item>
+                      <item translatable="yes">zdoom</item>
                     </items>
                     <child internal-child="entry">
                       <object class="GtkEntry">
                         <property name="can-focus">True</property>
+                        <property name="placeholder-text" translatable="yes">Engine Executable</property>
                       </object>
                     </child>
                   </object>
@@ -224,6 +432,30 @@
       </object>
     </child>
   </object>
+  <object class="GtkListStore" id="liststore1">
+    <columns>
+      <!-- column-name gchararray1 -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">File</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Merge</col>
+      </row>
+    </data>
+  </object>
+  <object class="GtkImage" id="move_down_icon">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">go-down</property>
+  </object>
+  <object class="GtkImage" id="move_up_icon">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">go-up</property>
+  </object>
   <object class="GtkImage" id="remove_icon">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
@@ -235,15 +467,15 @@
     <property name="icon-name">preferences-other</property>
   </object>
   <object class="GtkWindow" id="selection_window">
-    <property name="width-request">290</property>
-    <property name="height-request">120</property>
     <property name="can-focus">False</property>
     <property name="window-position">center</property>
-    <property name="default-width">360</property>
-    <property name="default-height">280</property>
+    <property name="default-width">450</property>
+    <property name="default-height">350</property>
     <signal name="destroy" handler="on_selection_window_destroy" swapped="no"/>
     <child>
       <object class="GtkBox">
+        <property name="width-request">290</property>
+        <property name="height-request">120</property>
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
@@ -282,17 +514,61 @@
                           <object class="GtkBox">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
+                            <property name="orientation">vertical</property>
                             <property name="spacing">8</property>
                             <child>
-                              <object class="GtkLabel">
+                              <object class="GtkBox">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="halign">end</property>
-                                <property name="hexpand">True</property>
-                                <property name="label" translatable="yes">Please add some IWADs with the</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#9a9a99999696"/>
-                                </attributes>
+                                <property name="valign">end</property>
+                                <property name="vexpand">True</property>
+                                <property name="spacing">8</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">True</property>
+                                    <property name="label" translatable="yes">Please add some IWADs with the</property>
+                                    <attributes>
+                                      <attribute name="foreground" value="#9a9a99999696"/>
+                                    </attributes>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="icon-name">list-add</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="hexpand">True</property>
+                                    <property name="label" translatable="yes">button</property>
+                                    <attributes>
+                                      <attribute name="foreground" value="#9a9a99999696"/>
+                                    </attributes>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
+                                  </packing>
+                                </child>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -301,24 +577,12 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkImage">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="icon-name">list-add</property>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">1</property>
-                              </packing>
-                            </child>
-                            <child>
                               <object class="GtkLabel">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="halign">start</property>
-                                <property name="hexpand">True</property>
-                                <property name="label" translatable="yes">button</property>
+                                <property name="valign">start</property>
+                                <property name="vexpand">True</property>
+                                <property name="label" translatable="yes">These are the main game files</property>
                                 <attributes>
                                   <attribute name="foreground" value="#9a9a99999696"/>
                                 </attributes>
@@ -326,7 +590,7 @@
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">2</property>
+                                <property name="position">1</property>
                               </packing>
                             </child>
                           </object>
@@ -360,17 +624,61 @@
                           <object class="GtkBox">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="spacing">8</property>
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">6</property>
                             <child>
-                              <object class="GtkLabel">
+                              <object class="GtkBox">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="halign">end</property>
-                                <property name="hexpand">True</property>
-                                <property name="label" translatable="yes">Please add some PWADs with the</property>
-                                <attributes>
-                                  <attribute name="foreground" value="#9a9a99999696"/>
-                                </attributes>
+                                <property name="valign">end</property>
+                                <property name="vexpand">True</property>
+                                <property name="spacing">8</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">True</property>
+                                    <property name="label" translatable="yes">Please add some PWADs with the</property>
+                                    <attributes>
+                                      <attribute name="foreground" value="#9a9a99999696"/>
+                                    </attributes>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="icon-name">list-add</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="hexpand">True</property>
+                                    <property name="label" translatable="yes">button</property>
+                                    <attributes>
+                                      <attribute name="foreground" value="#9a9a99999696"/>
+                                    </attributes>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
+                                  </packing>
+                                </child>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -379,24 +687,12 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkImage">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="icon-name">list-add</property>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">1</property>
-                              </packing>
-                            </child>
-                            <child>
                               <object class="GtkLabel">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="halign">start</property>
-                                <property name="hexpand">True</property>
-                                <property name="label" translatable="yes">button</property>
+                                <property name="valign">start</property>
+                                <property name="vexpand">True</property>
+                                <property name="label" translatable="yes">These are addons, mods, maps, etc.</property>
                                 <attributes>
                                   <attribute name="foreground" value="#9a9a99999696"/>
                                 </attributes>
@@ -404,7 +700,7 @@
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">2</property>
+                                <property name="position">1</property>
                               </packing>
                             </child>
                           </object>
@@ -436,6 +732,40 @@
             <property name="spacing">2</property>
             <child>
               <object class="GtkButton">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="tooltip-text" translatable="yes">Add Item</property>
+                <property name="image">add_icon</property>
+                <property name="relief">none</property>
+                <property name="always-show-image">True</property>
+                <signal name="clicked" handler="on_add_button_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="tooltip-text" translatable="yes">Remove Selected Item</property>
+                <property name="image">remove_icon</property>
+                <property name="relief">none</property>
+                <property name="always-show-image">True</property>
+                <signal name="clicked" handler="on_remove_button_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton">
                 <property name="label" translatable="yes">Launch</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
@@ -443,14 +773,29 @@
                 <property name="can-default">True</property>
                 <property name="has-default">True</property>
                 <property name="receives-default">True</property>
-                <signal name="activate" handler="on_launch_button_interacted" swapped="no"/>
-                <signal name="released" handler="on_launch_button_interacted" swapped="no"/>
+                <signal name="clicked" handler="on_launch_button_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="pack-type">end</property>
-                <property name="position">0</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="image">move_up_icon</property>
+                <property name="relief">none</property>
+                <property name="always-show-image">True</property>
+                <signal name="clicked" handler="on_move_up_button_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">3</property>
               </packing>
             </child>
             <child>
@@ -462,13 +807,14 @@
                 <property name="tooltip-text" translatable="yes">Settings</property>
                 <property name="image">settings_icon</property>
                 <property name="relief">none</property>
-                <signal name="released" handler="on_settings_button_released" swapped="no"/>
+                <property name="always-show-image">True</property>
+                <signal name="clicked" handler="on_settings_button_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="pack-type">end</property>
-                <property name="position">1</property>
+                <property name="position">4</property>
               </packing>
             </child>
             <child>
@@ -476,31 +822,15 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
-                <property name="tooltip-text" translatable="yes">Add Item</property>
-                <property name="image">add_icon</property>
+                <property name="image">move_down_icon</property>
                 <property name="relief">none</property>
-                <signal name="released" handler="on_add_button_released" swapped="no"/>
+                <property name="always-show-image">True</property>
+                <signal name="clicked" handler="on_move_down_button_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton">
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-                <property name="tooltip-text" translatable="yes">Remove Selected Item</property>
-                <property name="image">remove_icon</property>
-                <property name="relief">none</property>
-                <signal name="released" handler="on_remove_button_released" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">3</property>
+                <property name="position">5</property>
               </packing>
             </child>
           </object>
@@ -521,13 +851,14 @@
         <property name="subtitle" translatable="yes">by Nicholas Girga</property>
         <property name="show-close-button">True</property>
         <child>
-          <object class="GtkButton" id="about_button">
+          <object class="GtkButton">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
             <property name="tooltip-text" translatable="yes">About</property>
             <property name="image">about_icon</property>
-            <signal name="released" handler="on_about_button_released" swapped="no"/>
+            <property name="always-show-image">True</property>
+            <signal name="clicked" handler="on_about_button_clicked" swapped="no"/>
           </object>
           <packing>
             <property name="pack-type">end</property>
