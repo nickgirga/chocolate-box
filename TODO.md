@@ -8,4 +8,4 @@
  - Implement settings popover (replacing current settings button behavior)
    - Nest the current settings button's behavior as a button in the popover
    - ...
- - Improve keyboard and controller control in the launcher
+ - Implement controller input in the launcher

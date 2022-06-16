@@ -6,9 +6,10 @@
 
 # Imports
 import enum, gi, os, subprocess, sys
+gi.require_version('Gdk', '3.0')
 gi.require_version('Gtk', '3.0')
 gi.require_version('GdkPixbuf', '2.0')
-from gi.repository import GdkPixbuf, Gio, Gtk
+from gi.repository import Gdk, GdkPixbuf, Gio, Gtk
 from pathlib import Path
 
 
@@ -513,56 +514,64 @@ class Main:
             self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
 
     
+    # Opens the add IWAD window.
+    def open_add_iwad_window(self):
+        # get widgets
+        add_iwad_window = self.builder.get_object("add_iwad_window")
+        iwad_name = self.builder.get_object("iwad_name")
+        iwad_file = self.builder.get_object("iwad_file")
+       
+        # set window icon
+        if self.window_icon != "":
+            add_iwad_window.set_icon_from_file(self.window_icon)
+        else:
+            add_iwad_window.set_icon_name("window")
+
+        # reset settings
+        iwad_name.set_text("")
+        iwad_file.unselect_all()
+        iwad_file.set_filename("")
+
+        # present window
+        add_iwad_window.show_all()
+
+
+    # Opens the add PWAD window.
+    def open_add_pwad_window(self):
+        # get widgets
+        add_pwad_window = self.builder.get_object("add_pwad_window")
+        pwad_name = self.builder.get_object("pwad_name")
+        pwad_file = self.builder.get_object("pwad_file")
+        pwad_method = self.builder.get_object("pwad_method")
+
+        # set window icon
+        if self.window_icon != "":
+            add_pwad_window.set_icon_from_file(self.window_icon)
+        else:
+            add_pwad_window.set_icon_name("window")
+
+        # reset settings
+        pwad_name.set_text("")
+        pwad_file.unselect_all()
+        pwad_file.set_filename("")
+        pwad_method.set_active(0)
+    
+        # present window
+        add_pwad_window.show_all()
+
+
     # Called when the add button is clicked.
     def on_add_button_clicked(self, object, data = None):
         # determine if adding IWAD or PWAD
-        stack_switcher = self.builder.get_object("stack_switcher")
-        selected_stack = stack_switcher.get_stack().get_visible_child_name()
+        list_stack = self.builder.get_object("list_stack")
+        selected_stack = list_stack.get_visible_child_name()
         
         
         # show the right add window for the selected tab
         if selected_stack == "IWADs":
-            # get widgets
-            add_iwad_window = self.builder.get_object("add_iwad_window")
-            iwad_name = self.builder.get_object("iwad_name")
-            iwad_file = self.builder.get_object("iwad_file")
-           
-            # set window icon
-            if self.window_icon != "":
-                add_iwad_window.set_icon_from_file(self.window_icon)
-            else:
-                add_iwad_window.set_icon_name("window")
-
-            # reset settings
-            iwad_name.set_text("")
-            iwad_file.unselect_all()
-            iwad_file.set_filename("")
-
-            # present window
-            add_iwad_window.show_all()
-        
+            self.open_add_iwad_window()
         elif selected_stack == "PWADs":
-            # get widgets
-            add_pwad_window = self.builder.get_object("add_pwad_window")
-            pwad_name = self.builder.get_object("pwad_name")
-            pwad_file = self.builder.get_object("pwad_file")
-            pwad_method = self.builder.get_object("pwad_method")
-
-            # set window icon
-            if self.window_icon != "":
-                add_pwad_window.set_icon_from_file(self.window_icon)
-            else:
-                add_pwad_window.set_icon_name("window")
-
-            # reset settings
-            pwad_name.set_text("")
-            pwad_file.unselect_all()
-            pwad_file.set_filename("")
-            pwad_method.set_active(0)
-        
-            # present window
-            add_pwad_window.show_all()
-
+            self.open_add_pwad_window()
         else:
             sys.exit(-1) # selected stack's name is not expected; exit with code -1
 
@@ -587,7 +596,7 @@ class Main:
 
             selection_text = selection.get_child().get_text()
         
-            if self.create_simple_message_dialog("Are you sure you want to remove the \"" + selection_text + "\" IWAD from the list?", "Chocolate Box", True) == Gtk.ResponseType.NO:
+            if self.create_simple_message_dialog("Are you sure you want to remove the \"" + selection_text + "\" IWAD from the list?", "Chocolate Box", True) != Gtk.ResponseType.YES:
                 return
 
             lines = [] # create empty lines list to be filled
@@ -647,16 +656,18 @@ class Main:
         iwad_name_str = iwad_name.get_text()
         iwad_file_str = iwad_file.get_filename()
         exec_path_str = exec_path.get_active_text()
+        if iwad_file_str == None:
+            iwad_file_str = ""
 
         # check if any elements are empty
-        if iwad_name_str == "" or iwad_file_str == None or iwad_file_str == "" or exec_path_str == "":
-            message = "ERROR!: None of the IWAD elements can be left empty!"
+        if iwad_name_str == "" or exec_path_str == "":
+            message = "ERROR!: IWAD name and executable cannot be left empty!"
             print(message, ' ', '\n', file = sys.stderr)
             self.create_simple_message_dialog(message, "Chocolate Box - Error")
             return
 
         # check if any elements contain colons
-        if ":" in iwad_name_str or ":" in iwad_file_str or ":" in exec_path_str:
+        if ":" in iwad_name_str or ":" in exec_path_str or (iwad_file_str != "" and iwad_file_str != None) and ":" in iwad_file_str:
             error_message = "ERROR!: None of the IWAD elements can contain \":\"!"
             print(error_message, ' ', '\n', file = sys.stderr)
             self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
@@ -754,6 +765,67 @@ class Main:
     def on_add_pwad_window_delete_event(self, object, data = None):
         object.hide()
         return True
+
+
+    # Called when a key is pressed with the selection window active.
+    def on_selection_window_key_press_event(self, object, event):
+        # 
+        if event.state == Gdk.ModifierType.SHIFT_MASK:
+            if event.keyval == Gdk.KEY_Up:
+                # TODO: implement shift selected item up
+                pass
+            elif event.keyval == Gdk.KEY_Down:
+                # TODO: implement shift selected item down
+                pass
+
+        # ignore key modifiers
+        if not event.state == 0:
+            return
+
+        # get widgets
+        list_stack = self.builder.get_object("list_stack")
+        iwad_listbox = self.builder.get_object("iwad_listbox")
+        pwad_listbox = self.builder.get_object("pwad_listbox")
+       
+        # find the selected stack
+        selected_stack = list_stack.get_visible_child_name()
+        
+        if event.type == Gdk.EventType.KEY_PRESS:
+            # swap IWADs/PWADs menus when the left/right arrows are pressed
+            if event.keyval == Gdk.KEY_Left or event.keyval == Gdk.KEY_Right:
+                if selected_stack == "PWADs":
+                    list_stack.set_visible_child_name("IWADs")
+                    iwad_listbox.grab_focus()
+                elif selected_stack == "IWADs":
+                    list_stack.set_visible_child_name("PWADs")
+                    pwad_listbox.grab_focus()
+                else:
+                    sys.exit(-1) # selected stack's name is not expected; exit with code -1
+
+
+            # quit if ESCAPE is pressed
+            if event.keyval == Gdk.KEY_Escape:
+                Gtk.main_quit()
+
+            
+            # "press add button" if A is pressed
+            if event.keyval == Gdk.KEY_a:
+                self.on_add_button_clicked(None)
+            
+
+            # add IWAD if I is pressed
+            if event.keyval == Gdk.KEY_i:
+                self.open_add_iwad_window()
+
+            
+            # add PWAD if P is pressed
+            if event.keyval == Gdk.KEY_p:
+                self.open_add_pwad_window() 
+
+
+            # "press remove button" if R, DELETE, or BACKSPACE is pressed
+            if event.keyval == Gdk.KEY_r or event.keyval == Gdk.KEY_Delete or event.keyval == Gdk.KEY_KP_Delete or event.keyval == Gdk.KEY_BackSpace:
+                self.on_remove_button_clicked(None)
 
 
 # Start.
