@@ -54,7 +54,7 @@ class Main:
 
 
     # How the launcher should behave after launching.
-    launch_behavior = LaunchBehavior.NONE
+    launch_behavior = LaunchBehavior.EXIT
 
 
     # If extra information should be printed.
