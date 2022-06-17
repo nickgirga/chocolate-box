@@ -1,11 +1,5 @@
 # TODO
  - Implement edit IWAD entry button
- - Implement PWADs tab
- - Implement add PWAD button
- - Implement remove PWAD button
  - Implement edit PWAD entry button
- - Create and implement settings popover
- - Implement settings popover (replacing current settings button behavior)
-   - Nest the current settings button's behavior as a button in the popover
-   - ...
- - Improve keyboard and controller control in the launcher
+ - Add more settings to the settings popover
+ - Implement controller input in the launcher
