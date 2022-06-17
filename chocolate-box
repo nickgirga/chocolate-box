@@ -805,15 +805,367 @@ class Main:
 
     # Called when the move up button is clicked.
     def on_move_up_button_clicked(self, object, data = None):
-        # TODO: implement
-        self.not_implemented()
+        # determine if removing IWAD or PWAD
+        stack_switcher = self.builder.get_object("stack_switcher")
+        selected_stack = stack_switcher.get_stack().get_visible_child_name()
+
+        if selected_stack == "IWADs":
+            # get widgets
+            iwad_listbox = self.builder.get_object("iwad_listbox")
+            selected_row = iwad_listbox.get_selected_row()
+
+            # ensure an IWAD is selected
+            if selected_row == None:
+                message = "No IWAD is selected to be moved!"
+                print(message)
+                self.create_simple_message_dialog(message)
+                return
+
+            selected_text = selected_row.get_child().get_text() # get text from selected row
+
+            lines = [] # create empty list
+            index_to_move = -1 # the index of the line we need to move
+
+            # read IWADs file
+            try:
+                with open(self.iwads_file, "r") as file:
+                    index = 0 # the current index
+                    lines = file.readlines()
+                    for line in lines:
+                        if line[:len(selected_text) + 1] == selected_text + ":":
+                            index_to_move = index
+                        index += 1
+                    
+            except Exception as e:
+                error_message = (   "ERROR!: Something happened while trying to read the file that keeps track of IWADs!\n" +
+                                    "Could not move the selected IWAD.")
+                print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                return
+
+            # check if index_to_move was found
+            if index_to_move < 0:
+                error_message = "ERROR!: The selected IWAD could not be found in the IWADs file!"
+                print(error_message, ' ', '\n', file = sys.stderr)
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                return
+
+            # check if first item
+            if index_to_move == 1:
+                message = "Cannot move the first IWAD any further up!"
+                print(message)
+                self.create_simple_message_dialog(message)
+                return
+
+            # write to IWADs file
+            try:
+                with open(self.iwads_file, "w") as file:
+                    index = 0 # the current index
+                    temp_data = None # used to store information while moving a line
+                    
+                    while index < len(lines):
+                        if index == index_to_move -1:
+                            temp_data = lines[index]
+                            lines[index] = lines[index + 1]
+                        
+                        elif index == index_to_move:
+                            lines[index] = temp_data
+                        
+                        file.write(lines[index])
+
+                        index += 1
+
+            except Exception as e:
+                error_message = (   "ERROR!: Something happened while trying to write to the file that keeps track of IWADs!\n" +
+                                    "Could not move the selected IWAD.")
+                print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                return
+
+
+            self.update_iwad_list() # update IWAD list
+
+
+            # select the moved row
+            new_selected_row = iwad_listbox.get_row_at_index(index_to_move - 2)
+            if new_selected_row != None:
+                iwad_listbox.select_row(new_selected_row)
+
+
+        elif selected_stack == "PWADs":
+            # get widgets
+            pwad_listbox = self.builder.get_object("pwad_listbox")
+            selected_rows = pwad_listbox.get_selected_rows()
+
+            # ensure a PWAD is selected
+            if len(selected_rows) < 1:
+                message = "No PWAD is selected to be moved!"
+                print(message)
+                self.create_simple_message_dialog(message)
+                return
+
+            # ensure no more than one item is selected
+            elif len(selected_rows) > 1:
+                message = "Cannot move more than one PWAD at a time!"
+                print(message)
+                self.create_simple_message_dialog(message)
+                return
+
+            selected_text = selected_rows[0].get_child().get_text() # get text from selected row
+
+            lines = [] # create empty list
+            index_to_move = -1 # the index of the line we need to move
+
+            # read PWADs file
+            try:
+                with open(self.pwads_file, "r") as file:
+                    index = 0 # the current index
+                    lines = file.readlines()
+                    for line in lines:
+                        if line[:len(selected_text) + 1] == selected_text + ":":
+                            index_to_move = index
+                        index += 1
+                    
+            except Exception as e:
+                error_message = (   "ERROR!: Something happened while trying to read the file that keeps track of PWADs!\n" +
+                                    "Could not move the selected PWAD.")
+                print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                return
+
+            # check if index_to_move was found
+            if index_to_move < 0:
+                error_message = "ERROR!: The selected PWAD could not be found in the PWADs file!"
+                print(error_message, ' ', '\n', file = sys.stderr)
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                return
+
+            # check if first item
+            if index_to_move == 1:
+                message = "Cannot move the first PWAD any further up!"
+                print(message)
+                self.create_simple_message_dialog(message)
+                return
+
+            # write to PWADs file
+            try:
+                with open(self.pwads_file, "w") as file:
+                    index = 0 # the current index
+                    temp_data = None # used to store information while moving a line
+                    
+                    while index < len(lines):
+                        if index == index_to_move -1:
+                            temp_data = lines[index]
+                            lines[index] = lines[index + 1]
+                        
+                        elif index == index_to_move:
+                            lines[index] = temp_data
+                        
+                        file.write(lines[index])
+
+                        index += 1
+
+            except Exception as e:
+                error_message = (   "ERROR!: Something happened while trying to write to the file that keeps track of PWADs!\n" +
+                                    "Could not move the selected PWAD.")
+                print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                return
+
+
+            self.update_pwad_list() # update PWAD list
+
+
+            # select the moved row
+            new_selected_row = pwad_listbox.get_row_at_index(index_to_move - 2)
+            if new_selected_row != None:
+                pwad_listbox.select_row(new_selected_row)
+
+
+        else:
+            sys.exit(-1) # selected stack's name is not expected; exit with code -1
 
 
     # Called when the move down button is clicked.
     def on_move_down_button_clicked(self, object, data = None):
-        # TODO: implement
-        self.not_implemented()
+        stack_switcher = self.builder.get_object("stack_switcher")
+        selected_stack = stack_switcher.get_stack().get_visible_child_name()
 
+        if selected_stack == "IWADs":
+            # get widgets
+            iwad_listbox = self.builder.get_object("iwad_listbox")
+            selected_row = iwad_listbox.get_selected_row()
+
+            # ensure an IWAD is selected
+            if selected_row == None:
+                message = "No IWAD is selected to be moved!"
+                print(message)
+                self.create_simple_message_dialog(message)
+                return
+
+            selected_text = selected_row.get_child().get_text() # get text from selected row
+
+            lines = [] # create empty list
+            index_to_move = -1 # the index of the line we need to move
+
+            # read IWADs file
+            try:
+                with open(self.iwads_file, "r") as file:
+                    index = 0 # the current index
+                    lines = file.readlines()
+                    for line in lines:
+                        if line[:len(selected_text) + 1] == selected_text + ":":
+                            index_to_move = index
+                        index += 1
+                    
+            except Exception as e:
+                error_message = (   "ERROR!: Something happened while trying to read the file that keeps track of IWADs!\n" +
+                                    "Could not move the selected IWAD.")
+                print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                return
+
+            # check if index_to_move was found
+            if index_to_move < 0:
+                error_message = "ERROR!: The selected IWAD could not be found in the IWADs file!"
+                print(error_message, ' ', '\n', file = sys.stderr)
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                return
+
+            # check if last item
+            if index_to_move >= len(lines) - 1:
+                message = "Cannot move the last IWAD any further down!"
+                print(message)
+                self.create_simple_message_dialog(message)
+                return
+
+            # write to IWADs file
+            try:
+                with open(self.iwads_file, "w") as file:
+                    index = 0 # the current index
+                    temp_data = None # used to store information while moving a line
+                    
+                    while index < len(lines):
+                        if index == index_to_move:
+                            temp_data = lines[index]
+                            lines[index] = lines[index + 1]
+                        
+                        elif index == index_to_move + 1:
+                            lines[index] = temp_data
+                        
+                        file.write(lines[index])
+
+                        index += 1
+
+            except Exception as e:
+                error_message = (   "ERROR!: Something happened while trying to write to the file that keeps track of IWADs!\n" +
+                                    "Could not move the selected IWAD.")
+                print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                return
+
+
+            self.update_iwad_list() # update IWAD list
+
+
+            # select the moved row
+            new_selected_row = iwad_listbox.get_row_at_index(index_to_move)
+            if new_selected_row != None:
+                iwad_listbox.select_row(new_selected_row)
+
+
+        elif selected_stack == "PWADs":
+            # get widgets
+            pwad_listbox = self.builder.get_object("pwad_listbox")
+            selected_rows = pwad_listbox.get_selected_rows()
+
+            # ensure a PWAD is selected
+            if len(selected_rows) < 1:
+                message = "No PWAD is selected to be moved!"
+                print(message)
+                self.create_simple_message_dialog(message)
+                return
+
+            # ensure no more than one item is selected
+            elif len(selected_rows) > 1:
+                message = "Cannot move more than one PWAD at a time!"
+                print(message)
+                self.create_simple_message_dialog(message)
+                return
+
+            selected_text = selected_rows[0].get_child().get_text() # get text from selected row
+
+            lines = [] # create empty list
+            index_to_move = -1 # the index of the line we need to move
+
+            # read PWADs file
+            try:
+                with open(self.pwads_file, "r") as file:
+                    index = 0 # the current index
+                    lines = file.readlines()
+                    for line in lines:
+                        if line[:len(selected_text) + 1] == selected_text + ":":
+                            index_to_move = index
+                        index += 1
+                    
+            except Exception as e:
+                error_message = (   "ERROR!: Something happened while trying to read the file that keeps track of PWADs!\n" +
+                                    "Could not move the selected PWAD.")
+                print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                return
+
+            # check if index_to_move was found
+            if index_to_move < 0:
+                error_message = "ERROR!: The selected PWAD could not be found in the PWADs file!"
+                print(error_message, ' ', '\n', file = sys.stderr)
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                return
+
+            # check if last item
+            if index_to_move >= len(lines) - 1:
+                message = "Cannot move the last PWAD any further down!"
+                print(message)
+                self.create_simple_message_dialog(message)
+                return
+
+            # write to PWADs file
+            try:
+                with open(self.pwads_file, "w") as file:
+                    index = 0 # the current index
+                    temp_data = None # used to store information while moving a line
+                    
+                    while index < len(lines):
+                        if index == index_to_move:
+                            temp_data = lines[index]
+                            lines[index] = lines[index + 1]
+                        
+                        elif index == index_to_move + 1:
+                            lines[index] = temp_data
+                        
+                        file.write(lines[index])
+
+                        index += 1
+
+            except Exception as e:
+                error_message = (   "ERROR!: Something happened while trying to write to the file that keeps track of PWADs!\n" +
+                                    "Could not move the selected PWAD.")
+                print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                return
+
+
+            self.update_pwad_list() # update PWAD list
+
+
+            # select the moved row
+            new_selected_row = pwad_listbox.get_row_at_index(index_to_move)
+            if new_selected_row != None:
+                pwad_listbox.select_row(new_selected_row)
+
+
+        else:
+            sys.exit(-1) # selected stack's name is not expected; exit with code -1
 
     # Called when the IWAD add confirmation button is clicked.
     def on_iwad_add_confirm_button_clicked(self, object, data = None):
