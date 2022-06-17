@@ -661,7 +661,7 @@ class Main:
             try:
                 with open(self.iwads_file, "w") as file:
                     for line in lines:
-                        if line[:len(selection_text)] == selection_text:
+                        if len(line) > len(selection_text) + 1 and line[:len(selection_text) + 1] == selection_text + ":":
                             continue # skip line that starts with the selected name    
                         file.write(line) # write stored lines to empty file
             except Exception as e:
@@ -711,7 +711,7 @@ class Main:
                     for line in lines:
                         matches = False
                         for check in selection_text:
-                            if line[:len(check)] == check:
+                            if len(line) > len(check) + 1 and line[:len(check) + 1] == check + ":":
                                 matches = True
                         if matches:
                             continue # skip lines that start with selected names
