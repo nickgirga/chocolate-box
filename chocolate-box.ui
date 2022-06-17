@@ -24,7 +24,7 @@
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Chocolate Box - Add an IWAD</property>
     <property name="modal">True</property>
-    <property name="window-position">center</property>
+    <property name="window-position">center-on-parent</property>
     <property name="default-width">480</property>
     <property name="default-height">145</property>
     <property name="destroy-with-parent">True</property>
@@ -191,17 +191,6 @@
                     <property name="can-focus">False</property>
                     <property name="active">0</property>
                     <property name="has-entry">True</property>
-                    <items>
-                      <item>chocolate-doom</item>
-                      <item translatable="yes">chocolate-heretic</item>
-                      <item translatable="yes">chocolate-hexen</item>
-                      <item translatable="yes">chocolate-strife</item>
-                      <item translatable="yes">crispy-doom</item>
-                      <item translatable="yes">crispy-heretic</item>
-                      <item translatable="yes">crispy-hexen</item>
-                      <item translatable="yes">gzdoom</item>
-                      <item translatable="yes">zdoom</item>
-                    </items>
                     <child internal-child="entry">
                       <object class="GtkEntry">
                         <property name="can-focus">True</property>
@@ -236,7 +225,7 @@
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Chocolate Box - Add a PWAD</property>
     <property name="modal">True</property>
-    <property name="window-position">center</property>
+    <property name="window-position">center-on-parent</property>
     <property name="default-width">480</property>
     <property name="default-height">145</property>
     <property name="destroy-with-parent">True</property>
@@ -430,20 +419,6 @@
         </child>
       </object>
     </child>
-  </object>
-  <object class="GtkListStore" id="liststore1">
-    <columns>
-      <!-- column-name gchararray1 -->
-      <column type="gchararray"/>
-    </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">File</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">Merge</col>
-      </row>
-    </data>
   </object>
   <object class="GtkImage" id="move_down_icon">
     <property name="visible">True</property>
@@ -803,7 +778,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton">
+              <object class="GtkButton" id="settings_button">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="focus-on-click">False</property>
@@ -812,7 +787,7 @@
                 <property name="image">settings_icon</property>
                 <property name="relief">none</property>
                 <property name="always-show-image">True</property>
-                <signal name="clicked" handler="on_settings_button_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_settings_button_clicked" object="settings_popover" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -867,6 +842,158 @@
           </object>
           <packing>
             <property name="pack-type">end</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkPopover" id="settings_popover">
+    <property name="width-request">0</property>
+    <property name="height-request">0</property>
+    <property name="can-focus">False</property>
+    <property name="relative-to">settings_button</property>
+    <child>
+      <object class="GtkStack">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="transition-type">slide-left-right</property>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkModelButton">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="vexpand">True</property>
+                <property name="text" translatable="yes">Executable Override</property>
+                <property name="menu-name">exec</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSeparator">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkModelButton">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="vexpand">True</property>
+                <property name="text" translatable="yes">Settings</property>
+                <signal name="clicked" handler="on_settings_model_button_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="name">main</property>
+            <property name="title" translatable="yes">main</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkModelButton">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="vexpand">True</property>
+                <property name="text" translatable="yes">Back</property>
+                <property name="menu-name">main</property>
+                <property name="inverted">True</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSeparator">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="margin-start">8</property>
+                    <property name="margin-end">4</property>
+                    <property name="vexpand">True</property>
+                    <property name="label" translatable="yes">Executable: </property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="exec_path_override">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="has-entry">True</property>
+                    <items>
+                      <item translatable="yes">[Saved]</item>
+                    </items>
+                    <child internal-child="entry">
+                      <object class="GtkEntry">
+                        <property name="can-focus">True</property>
+                        <property name="text" translatable="yes">[Saved]</property>
+                        <property name="input-hints">GTK_INPUT_HINT_NO_SPELLCHECK | GTK_INPUT_HINT_NO_EMOJI | GTK_INPUT_HINT_NONE</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="name">exec</property>
+            <property name="title" translatable="yes">exec</property>
+            <property name="position">1</property>
           </packing>
         </child>
       </object>
