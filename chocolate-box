@@ -280,6 +280,12 @@ class Main:
             if self.command_exists(check):
                 results.append(check) # add executable to list if it is available on the system
 
+        if results == []:
+            warning_message = ( "WARNING!: DOOM source ports with known compatibility could not be found!\n" +
+                                "You must specify a path to a DOOM source port when adding an IWAD!")
+            print(warning_message)
+            self.create_simple_message_dialog(warning_message, "Chocolate Box - Warning")
+
         return results # return populated results list
 
 
