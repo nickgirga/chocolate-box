@@ -8,7 +8,7 @@
  - [Doomworld /idGames](https://www.doomworld.com/idgames/api/) integration
    - Create a browser to look for and download WADs
    - Extract downloaded files
-   - Automatically detect extracted WADs and PK3s and add them to the 
+   - Automatically detect extracted WADs and PK3s and add them to the PWAD list
    - Allow alternative sources
    - Create a Python interface so the API calls to the sources can be swapped out rather easily if needed
  - Add a Delete WAD *file* button (will be useful for managing downloaded WADs)
