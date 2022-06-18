@@ -5,7 +5,7 @@
 
 
 # Imports
-import enum, gi, os, subprocess, sys
+import enum, gi, os, subprocess, sys, webbrowser
 gi.require_version('Gdk', '3.0')
 gi.require_version('Gtk', '3.0')
 gi.require_version('GdkPixbuf', '2.0')
@@ -288,25 +288,6 @@ class Main:
 
         return results # return populated results list
 
-
-    # Returns properties from a config file as a dictionary.
-    def read_config(self, file_path: str) -> {}:
-        config = {}
-
-        if os.path.isfile(file_path):
-            try:
-                with open(file_path, "r") as file:
-                    for line in file.readlines():
-                        # TODO: implement
-                        pass
-            except Exception as e:
-                error_message = "ERROR!: Something happened while trying to read configuration file (" + file_path + ")!"
-                print(str(e) + "\n" + error_message)
-                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
-                sys.exit(5) # config file read was interrupted; exit with code 5
-
-        return config
-
     
     # Updates the list of IWADs in the selection window.
     def update_iwad_list(self):
@@ -492,11 +473,6 @@ class Main:
         return response
 
 
-    # Informs user of incomplete features.
-    def not_implemented(self):
-        self.create_simple_message_dialog("This feature has not been implemented yet!", "Chocolate Box - Error")
-
-
     # Called when the launch button is clicked.
     def on_launch_button_clicked(self, object, data = None):
         # get selected IWAD ListBoxRow
@@ -595,6 +571,7 @@ class Main:
         popover.popup()
 
 
+    # Called when the settings button in the popover is clicked.
     def on_settings_model_button_clicked(self, object, data = None):
         listbox = self.builder.get_object("iwad_listbox")
         selection = listbox.get_selected_row()
@@ -624,13 +601,130 @@ class Main:
             self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
             return
 
+        if exec_path == "crispy-doom" or exec_path == "crispy-heretic" or exec_path == "crispy-hexen":
+            if self.command_exists(exec_path + "-setup"):
+                command = exec_path + "-setup"
+            elif self.command_exists("crispy-setup"):
+                command = "crispy-setup"
+            else:
+                message = (   "Chocolate Box could not find the setup executable for Crispy DOOM!\n" +
+                                    "Please launch Crispy DOOM's setup manually outside of Chocolate Box.")
+                print(message)
+                self.create_simple_message_dialog(message)
+                return
+        elif exec_path == "gzdoom" or exec_path == "zdoom":
+            message = (("GZDoom" if exec_path == "gzdoom" else "ZDoom") + " does not have a separate setup executable.\n" +
+                        "Please configure settings with the in-game menus.")
+            print(message)
+            self.create_simple_message_dialog(message)
+            return
+        else:
+            if self.command_exists(exec_path + "-setup"):
+                command = exec_path + "-setup"
+            else:
+                message = ( "Chocolate Box could not find the setup executable for your source port.\n" +
+                            "Please launch the setup manually outside of Chocolate Box.")
+                print(message)
+                self.create_simple_message_dialog(message)
+                return
+
         # run setup
         try:
-            subprocess.run([exec_path + "-setup"], capture_output = not self.verbose)
+            subprocess.run([command], capture_output = not self.verbose)
         except Exception as e:
             error_message = "ERROR!: Something happened while trying to run the setup for the selected IWAD's executable!"
             print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
             self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+
+
+    # Opens the edit IWAD window.
+    def open_edit_iwad_window(self, selection_text: str):
+        # get widgets
+        add_iwad_window = self.builder.get_object("add_iwad_window")
+        iwad_name = self.builder.get_object("iwad_name")
+        iwad_file = self.builder.get_object("iwad_file")
+        exec_path = self.builder.get_object("exec_path")
+        iwad_add_confirm_button = self.builder.get_object("iwad_add_confirm_button")
+        iwad_listbox = self.builder.get_object("iwad_listbox")
+
+
+        # set edit-specific settings
+        add_iwad_window.set_title("Chocolate Box - Edit an IWAD")
+        iwad_add_confirm_button.set_label("Confirm")
+        try:
+            iwad_add_confirm_button.disconnect_by_func(self.on_iwad_add_confirm_button_clicked)
+        except TypeError: # the add function was not already connected
+            pass
+
+        try:
+            iwad_add_confirm_button.disconnect_by_func(self.on_iwad_edit_confirm_button_clicked)
+        except TypeError: # the edit function was not already connected
+            pass
+
+        iwad_add_confirm_button.connect("clicked", self.on_iwad_edit_confirm_button_clicked, selection_text)
+
+        # set window icon
+        if self.window_icon != "":
+            add_iwad_window.set_icon_from_file(self.window_icon)
+        else:
+            add_iwad_window.set_icon_name("window")
+
+        # read settings
+        iwad_name_r = ""
+        iwad_file_r = ""
+        exec_path_r = ""
+        with open(self.iwads_file, "r") as file:
+            for line in file.readlines():
+                if line[:len(selection_text) + 1] == selection_text + ":":
+                    iwad_elements = line.split(':')
+                    iwad_name_r = iwad_elements[0]
+                    iwad_file_r = iwad_elements[1]
+                    exec_path_r = iwad_elements[2]
+                    break
+        
+        if exec_path_r[len(exec_path_r) - 1] == '\n':
+            exec_path_r = exec_path_r[:-1] # remove new line
+
+        # set settings
+        iwad_name.set_text(iwad_name_r)
+        iwad_file.set_filename(iwad_file_r)
+        exec_path.remove_all()
+        for _exec in self.get_exec():
+            if _exec == exec_path_r:
+                continue
+            exec_path.append_text(_exec)
+        if exec_path_r != "":
+            exec_path.prepend("saved_exec", exec_path_r)
+            exec_path.set_active_id("saved_exec") 
+            
+
+        # present window
+        add_iwad_window.show_all()
+
+
+    # Called when the edit selected item button in the popover is clicked.
+    def on_edit_button_clicked(self, object, data = None):
+        # determine if adding IWAD or PWAD
+        list_stack = self.builder.get_object("list_stack")
+        selected_stack = list_stack.get_visible_child_name()
+
+        if selected_stack == "IWADs":
+            # get selected IWAD name
+            iwad_listbox = self.builder.get_object("iwad_listbox")
+            selection = iwad_listbox.get_selected_row()
+            if selection != None:
+                selection_text = selection.get_child().get_text()
+            else:
+                message = "You must select an IWAD before pressing the edit button!"
+                print(message)
+                self.create_simple_message_dialog(message)
+                return
+
+            self.open_edit_iwad_window(selection_text)
+        elif selected_stack == "PWADs":
+            pass
+        else:
+            sys.exit(-1) # selected stack's name is not expected; exit with code -1
 
     
     # Opens the add IWAD window.
@@ -639,7 +733,23 @@ class Main:
         add_iwad_window = self.builder.get_object("add_iwad_window")
         iwad_name = self.builder.get_object("iwad_name")
         iwad_file = self.builder.get_object("iwad_file")
-       
+        iwad_add_confirm_button = self.builder.get_object("iwad_add_confirm_button")
+
+        # set add-specific settings
+        add_iwad_window.set_title("Chocolate Box - Add an IWAD")
+        iwad_add_confirm_button.set_label("Add")
+        try:
+            iwad_add_confirm_button.disconnect_by_func(self.on_iwad_add_confirm_button_clicked)
+        except TypeError: # the add function was not already connected
+            pass
+
+        try:
+            iwad_add_confirm_button.disconnect_by_func(self.on_iwad_edit_confirm_button_clicked)
+        except TypeError: # the edit function was not already connected
+            pass
+
+        iwad_add_confirm_button.connect("clicked", self.on_iwad_add_confirm_button_clicked)
+
         # set window icon
         if self.window_icon != "":
             add_iwad_window.set_icon_from_file(self.window_icon)
@@ -1167,6 +1277,84 @@ class Main:
         else:
             sys.exit(-1) # selected stack's name is not expected; exit with code -1
 
+
+    # Called when the IWAD edit confirmation button is clicked.
+    def on_iwad_edit_confirm_button_clicked(self, object, selection_text = None):
+        # get widgets
+        window = self.builder.get_object("add_iwad_window")
+        iwad_name = self.builder.get_object("iwad_name")
+        iwad_file = self.builder.get_object("iwad_file")
+        exec_path = self.builder.get_object("exec_path")
+        iwad_listbox = self.builder.get_object("iwad_listbox")
+
+        # get information
+        iwad_name_str = iwad_name.get_text()
+        iwad_file_str = iwad_file.get_filename()
+        exec_path_str = exec_path.get_active_text()
+        if iwad_file_str == None:
+            iwad_file_str = ""
+
+        # check if any elements are empty
+        if iwad_name_str == "" or exec_path_str == "":
+            message = "ERROR!: IWAD name and executable cannot be left empty!"
+            print(message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(message, "Chocolate Box - Error", False, window)
+            return
+
+        # check if any elements contain colons
+        if ":" in iwad_name_str or ":" in exec_path_str or (iwad_file_str != "" and iwad_file_str != None) and ":" in iwad_file_str:
+            error_message = "ERROR!: None of the IWAD elements can contain \":\"!"
+            print(error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, window)
+            return
+
+        lines = [] # create empty list for lines
+
+
+        # check for duplicates
+        try:
+            with open(self.iwads_file, "r") as file:
+                lines = file.readlines()
+                for line in lines:
+                    if line[:len(iwad_name_str) + 1] == iwad_name_str + ":" and iwad_name_str != selection_text:
+                        message = "An IWAD with the specified name already exists!"
+                        print(message)
+                        self.create_simple_message_dialog(message, "Chocolate Box", False, window)
+                        return
+        except Exception as e:
+            error_message = "ERROR!: Something happened while trying to check the IWADs file for duplicate names!"
+            print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, window)
+            return
+
+
+        # write to IWADs file
+        altered_line_index = -1 # the index of the line that was changed
+        try:
+            with open(self.iwads_file, "w") as file:
+                index = 0 # the current index
+                for line in lines:
+                    if line[:len(selection_text) + 1] == selection_text + ":":
+                        altered_line_index = index
+                        file.write(iwad_name_str + ":" + iwad_file_str + ":" + exec_path_str + "\n")
+                        index += 1
+                        continue
+                    file.write(line)
+                    index += 1
+        except Exception as e:
+            error_message = "ERROR!: Something happened while trying to write to the IWADs file!"
+            print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+            return
+        
+        self.update_iwad_list()
+        row = iwad_listbox.get_row_at_index(altered_line_index - 1)
+        if row != None:
+            iwad_listbox.select_row(row)
+
+        window.hide()
+
+
     # Called when the IWAD add confirmation button is clicked.
     def on_iwad_add_confirm_button_clicked(self, object, data = None):
         # get widgets
@@ -1200,7 +1388,7 @@ class Main:
         try:
             with open(self.iwads_file, "r") as file:
                 for line in file.readlines():
-                    if line[:len(iwad_name_str)] == iwad_name_str:
+                    if line[:len(iwad_name_str) + 1] == iwad_name_str + ":":
                         message = "An IWAD with the specified name already exists!"
                         print(message)
                         self.create_simple_message_dialog(message, "Chocolate Box", False, window)
@@ -1328,6 +1516,11 @@ class Main:
         # run and destroy about dialog
         about.run()
         about.destroy()
+
+
+    # Called when the help button is clicked.
+    def on_help_button_clicked(self, object, data = None):
+        webbrowser.open_new_tab("https://gitlab.com/nickgirga/chocolate-box/-/wikis/home") # open project Wiki in new tab of browser
 
 
     # Called when add_iwad_window is deleted.

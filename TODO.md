@@ -1,5 +1,14 @@
 # TODO
- - Implement edit IWAD entry button
  - Implement edit PWAD entry button
  - Add more settings to the settings popover
  - Implement controller input in the launcher
+ - Use [`Glib.spawn_async_with_pipes(str, str, str, GLib.SpawnFlags, GLib.SpawnChildSetupFunc, object)`](https://lazka.github.io/pgi-docs/#GLib-2.0/functions.html#GLib.spawn_async_with_pipes) to start DOOM to prevent Chocolate Box UI from locking up while DOOM is running
+ - Flatpak
+ - AppImage
+ - [Doomworld /idGames](https://www.doomworld.com/idgames/api/) integration
+   - Create a browser to look for and download WADs
+   - Extract downloaded files
+   - Automatically detect extracted WADs and PK3s and add them to the 
+   - Allow alternative sources
+   - Create a Python interface so the API calls to the sources can be swapped out rather easily if needed
+ - Add a Delete WAD *file* button (will be useful for managing downloaded WADs)
