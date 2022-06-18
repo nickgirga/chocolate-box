@@ -6,13 +6,12 @@ pkgdesc="Simple GUI for Chocolate DOOM"
 arch=('any')
 url="https://gitlab.com/nickgirga/chocolate-box"
 license=('MIT')
-groups=()
 depends=('python'
  	 'gtk3'
- 	 'python-gobject'
- 	 'chocolate-doom')
+ 	 'python-gobject')
 makedepends=('git')
-optdepends=('crispy-doom'
+optdepends=('chocolate-doom'
+	    'crispy-doom'
 	    'zdoom'
 	    'gzdoom'
 	    'freedm'
@@ -21,15 +20,7 @@ optdepends=('crispy-doom'
 	    'doom1-wad'
 	    'heretic1-wad'
 	    'hexen1-wad')
-provides=()
-conflicts=()
-replaces=()
-backup=()
-options=()
-install=
-changelog=
 source=("$pkgname::git+https://gitlab.com/nickgirga/chocolate-box.git")
-noextract=()
 md5sums=('SKIP')
 
 pkgver() {
