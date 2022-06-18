@@ -7,7 +7,7 @@ Chocolate Box provides simple GUI for [Chocolate DOOM](https://github.com/chocol
  - Supports numerous [source ports](https://doom.fandom.com/wiki/Source_port)
  - Stores path to preferred source port along with IWAD
    - Allows custom executable paths
- - Allows you to override the stored source port path temporarily
+   - Allows you to override the stored source port path temporarily
  - Supports `-file` and `-merge` modifications
    - Can use numerous modifications at the same time
  - Keyboard shortcuts for quick navigation
