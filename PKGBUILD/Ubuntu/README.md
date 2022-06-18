@@ -17,6 +17,8 @@ apt install ./[package_name].deb
 
 ***Done!*** You can now launch Chocolate Box from the icon in the launcher or with the `chocolate-box` command!
 
+Note: If you do not have a source port such as `chocolate-doom`, `crispy-doom`, `gzdoom`, or `zdoom` installed, you will need to install one before Chocolate Box can serve a purpose. If installed in non-standard location, you will need to specify its path in the `Executable` field when adding a new IWAD.
+
 Optionally, you can build this package yourself. If the provided package is not working for you, building it yourself may help. For example, currently only x86_64 packages are being provided, so users with ARM-based machines will need to repackage it themselves. For more information, see the [How do I build it myself?](#advanced-how-do-i-build-it-myself) section. ***Note: most users will not have to do this.***
 
 #### [Advanced] How do I build it myself?
