@@ -1,5 +1,5 @@
 # TODO
- - Implement edit PWAD entry button
+ - Implement "Launch Behavior" option in settings popover
  - Add more settings to the settings popover
  - Implement controller input in the launcher
  - Use [`Glib.spawn_async_with_pipes(str, str, str, GLib.SpawnFlags, GLib.SpawnChildSetupFunc, object)`](https://lazka.github.io/pgi-docs/#GLib-2.0/functions.html#GLib.spawn_async_with_pipes) to start DOOM to prevent Chocolate Box UI from locking up while DOOM is running

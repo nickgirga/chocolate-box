@@ -1094,7 +1094,6 @@
         </child>
         <child>
           <object class="GtkSeparator">
-            <property name="visible">True</property>
             <property name="can-focus">False</property>
           </object>
           <packing>
@@ -1105,7 +1104,6 @@
         </child>
         <child>
           <object class="GtkModelButton">
-            <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
             <property name="text" translatable="yes">Chocolate Box Settings</property>

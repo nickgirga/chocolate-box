@@ -530,18 +530,16 @@ class Main:
         if merge_paths != ["-merge"]:
             command += merge_paths
 
-        window = self.builder.get_object("selection_window") # get window object
 
-        if window:
-            if self.launch_behavior == self.LaunchBehavior.MINIMIZE or self.launch_behavior == self.LaunchBehavior.STAY_MINIMIZED:
-                window.iconify() # minimize launcher
-            elif self.launch_behavior == self.LaunchBehavior.EXIT:
-                window.hide() # hide launcher
+        if self.launch_behavior == self.LaunchBehavior.MINIMIZE or self.launch_behavior == self.LaunchBehavior.STAY_MINIMIZED:
+            self.window.iconify() # minimize launcher
+        elif self.launch_behavior == self.LaunchBehavior.EXIT:
+            self.window.hide() # hide launcher
 
 
-            if self.launch_behavior != self.LaunchBehavior.NONE:
-                while Gtk.events_pending():
-                    Gtk.main_iteration() # wait for launcher to finish UI execution before launching
+        if self.launch_behavior != self.LaunchBehavior.NONE:
+            while Gtk.events_pending():
+                Gtk.main_iteration() # wait for launcher to finish UI execution before launching
         
         if self.verbose:
             print("Launching with command: " + str(command))
@@ -557,11 +555,10 @@ class Main:
             print(str(e) + "\n" + warning_message)
             self.create_simple_message_dialog(warning_message, "Chocolate Box - Warning")
 
-        if window:
-            if self.launch_behavior == self.LaunchBehavior.MINIMIZE:
-                window.present() # present launcher
-            elif self.launch_behavior == self.LaunchBehavior.EXIT:
-                window.close() # exit launcher
+        if self.launch_behavior == self.LaunchBehavior.MINIMIZE:
+            self.window.present() # present launcher
+        elif self.launch_behavior == self.LaunchBehavior.EXIT:
+            self.window.close() # exit launcher
 
 
     # Called when the settings button is clicked.
@@ -586,19 +583,19 @@ class Main:
             else:
                 error_message = "ERROR!: No IWAD information could be found about the selected IWAD!"
                 print(error_message, ' ', '\n', file = sys.stderr)
-                self.create_simple_message_dialog(error_message)
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
         else:
             message = "You must select an IWAD before pressing the settings button!"
             print(message)
-            self.create_simple_message_dialog(message)
+            self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
             return
 
         # check if exec path could be found
         if exec_path == "":
             error_message = "ERROR!: Could not get executable path!"
             print(error_message, ' ', '\n', file = sys.stderr)
-            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
             return
 
         if exec_path == "crispy-doom" or exec_path == "crispy-heretic" or exec_path == "crispy-hexen":
@@ -610,13 +607,13 @@ class Main:
                 message = (   "Chocolate Box could not find the setup executable for Crispy DOOM!\n" +
                                     "Please launch Crispy DOOM's setup manually outside of Chocolate Box.")
                 print(message)
-                self.create_simple_message_dialog(message)
+                self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
                 return
         elif exec_path == "gzdoom" or exec_path == "zdoom":
             message = (("GZDoom" if exec_path == "gzdoom" else "ZDoom") + " does not have a separate setup executable.\n" +
                         "Please configure settings with the in-game menus.")
             print(message)
-            self.create_simple_message_dialog(message)
+            self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
             return
         else:
             if self.command_exists(exec_path + "-setup"):
@@ -625,7 +622,7 @@ class Main:
                 message = ( "Chocolate Box could not find the setup executable for your source port.\n" +
                             "Please launch the setup manually outside of Chocolate Box.")
                 print(message)
-                self.create_simple_message_dialog(message)
+                self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
                 return
 
         # run setup
@@ -634,7 +631,49 @@ class Main:
         except Exception as e:
             error_message = "ERROR!: Something happened while trying to run the setup for the selected IWAD's executable!"
             print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
-            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
+
+
+    # Called when the edit selected item button in the popover is clicked.
+    def on_edit_button_clicked(self, object, data = None):
+        # determine if adding IWAD or PWAD
+        list_stack = self.builder.get_object("list_stack")
+        selected_stack = list_stack.get_visible_child_name()
+
+        if selected_stack == "IWADs":
+            # get selected IWAD name
+            iwad_listbox = self.builder.get_object("iwad_listbox")
+            selection = iwad_listbox.get_selected_row()
+            if selection != None:
+                selection_text = selection.get_child().get_text()
+            else:
+                message = "You must select an IWAD before pressing the edit button!"
+                print(message)
+                self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
+                return
+
+            self.open_edit_iwad_window(selection_text)
+        elif selected_stack == "PWADs":
+            # get selected PWAD name
+            pwad_listbox = self.builder.get_object("pwad_listbox")
+            selection = pwad_listbox.get_selected_rows()
+            if len(selection) > 1:
+                message = "Cannot edit more than one PWAD at a time!"
+                print(message)
+                self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
+                return
+            elif len(selection) < 1:
+                message = "You must select a PWAD before pressing the edit button!"
+                print(message)
+                self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
+                return
+
+            selection_text = selection[0].get_child().get_text()
+
+            self.open_edit_pwad_window(selection_text)
+
+        else:
+            sys.exit(-1) # selected stack's name is not expected; exit with code -1
 
 
     # Opens the edit IWAD window.
@@ -645,7 +684,6 @@ class Main:
         iwad_file = self.builder.get_object("iwad_file")
         exec_path = self.builder.get_object("exec_path")
         iwad_add_confirm_button = self.builder.get_object("iwad_add_confirm_button")
-        iwad_listbox = self.builder.get_object("iwad_listbox")
 
 
         # set edit-specific settings
@@ -673,15 +711,21 @@ class Main:
         iwad_name_r = ""
         iwad_file_r = ""
         exec_path_r = ""
-        with open(self.iwads_file, "r") as file:
-            for line in file.readlines():
-                if line[:len(selection_text) + 1] == selection_text + ":":
-                    iwad_elements = line.split(':')
-                    iwad_name_r = iwad_elements[0]
-                    iwad_file_r = iwad_elements[1]
-                    exec_path_r = iwad_elements[2]
-                    break
-        
+        try:
+            with open(self.iwads_file, "r") as file:
+                for line in file.readlines():
+                    if line[:len(selection_text) + 1] == selection_text + ":":
+                        iwad_elements = line.split(':')
+                        iwad_name_r = iwad_elements[0]
+                        iwad_file_r = iwad_elements[1]
+                        exec_path_r = iwad_elements[2]
+                        break
+        except Exception as e:
+            error_message = "ERROR!: Something happened while trying to read the file that keeps track of IWADs!"
+            print(str(e) + "\n" + error_message)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
+            return
+
         if exec_path_r[len(exec_path_r) - 1] == '\n':
             exec_path_r = exec_path_r[:-1] # remove new line
 
@@ -702,31 +746,6 @@ class Main:
         add_iwad_window.show_all()
 
 
-    # Called when the edit selected item button in the popover is clicked.
-    def on_edit_button_clicked(self, object, data = None):
-        # determine if adding IWAD or PWAD
-        list_stack = self.builder.get_object("list_stack")
-        selected_stack = list_stack.get_visible_child_name()
-
-        if selected_stack == "IWADs":
-            # get selected IWAD name
-            iwad_listbox = self.builder.get_object("iwad_listbox")
-            selection = iwad_listbox.get_selected_row()
-            if selection != None:
-                selection_text = selection.get_child().get_text()
-            else:
-                message = "You must select an IWAD before pressing the edit button!"
-                print(message)
-                self.create_simple_message_dialog(message)
-                return
-
-            self.open_edit_iwad_window(selection_text)
-        elif selected_stack == "PWADs":
-            pass
-        else:
-            sys.exit(-1) # selected stack's name is not expected; exit with code -1
-
-    
     # Opens the add IWAD window.
     def open_add_iwad_window(self):
         # get widgets
@@ -765,6 +784,68 @@ class Main:
         add_iwad_window.show_all()
 
 
+    # Opens the edit PWAD window.
+    def open_edit_pwad_window(self, selection_text: str):
+        # get widgets
+        add_pwad_window = self.builder.get_object("add_pwad_window")
+        pwad_name = self.builder.get_object("pwad_name")
+        pwad_file = self.builder.get_object("pwad_file")
+        pwad_method = self.builder.get_object("pwad_method")
+        pwad_add_confirm_button = self.builder.get_object("pwad_add_confirm_button")
+
+        # set edit-specific settings
+        add_pwad_window.set_title("Chocolate Box - Edit a PWAD")
+        pwad_add_confirm_button.set_label("Confirm")
+        try:
+            pwad_add_confirm_button.disconnect_by_func(self.on_pwad_add_confirm_button_clicked)
+        except TypeError: # the add function was not already connected
+            pass
+
+        try:
+            pwad_add_confirm_button.disconnect_by_func(self.on_pwad_edit_confirm_button_clicked)
+        except TypeError: # the edit function was not already connected
+            pass
+
+        pwad_add_confirm_button.connect("clicked", self.on_pwad_edit_confirm_button_clicked, selection_text)
+
+        # set window icon
+        if self.window_icon != "":
+            add_pwad_window.set_icon_from_file(self.window_icon)
+        else:
+            add_pwad_window.set_icon_name("window")
+
+        # read settings
+        pwad_name_r = ""
+        pwad_file_r = ""
+        pwad_method_r = ""
+        try:
+            with open(self.pwads_file, "r") as file:
+                for line in file.readlines():
+                    if line[:len(selection_text) + 1] == selection_text + ":":
+                        pwad_elements = line.split(':')
+                        pwad_name_r = pwad_elements[0]
+                        pwad_file_r = pwad_elements[1]
+                        pwad_method_r = pwad_elements[2]
+                        break
+        except Exception as e:
+            error_message = "ERROR!: Something happened while trying to read the file that keeps track of IWADs!"
+            print(str(e) + "\n" + error_message)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
+            return
+
+        if pwad_method_r[len(pwad_method_r) - 1] == '\n':
+            pwad_method_r = pwad_method_r[:-1] # remove new line
+
+        # set settings
+        pwad_name.set_text(pwad_name_r)
+        pwad_file.set_filename(pwad_file_r)
+        pwad_method.set_active_id("merge" if pwad_method_r == "merge" else "file")
+
+
+        # present window
+        add_pwad_window.show_all()
+
+
     # Opens the add PWAD window.
     def open_add_pwad_window(self):
         # get widgets
@@ -772,6 +853,22 @@ class Main:
         pwad_name = self.builder.get_object("pwad_name")
         pwad_file = self.builder.get_object("pwad_file")
         pwad_method = self.builder.get_object("pwad_method")
+        pwad_add_confirm_button = self.builder.get_object("pwad_add_confirm_button")
+
+        # set add-specific settings
+        add_pwad_window.set_title("Chocolate Box - Add a PWAD")
+        pwad_add_confirm_button.set_label("Add")
+        try:
+            pwad_add_confirm_button.disconnect_by_func(self.on_pwad_add_confirm_button_clicked)
+        except TypeError: # the add function was not already connected
+            pass
+
+        try:
+            pwad_add_confirm_button.disconnect_by_func(self.on_pwad_edit_confirm_button_clicked)
+        except TypeError: # the edit function was not already connected
+            pass
+
+        pwad_add_confirm_button.connect("clicked", self.on_pwad_add_confirm_button_clicked)
 
         # set window icon
         if self.window_icon != "":
@@ -819,12 +916,12 @@ class Main:
             if selection == None:
                 message = "No IWAD is selected for removal!"
                 print(message)
-                self.create_simple_message_dialog(message)
+                self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
                 return
 
             selection_text = selection.get_child().get_text()
         
-            if self.create_simple_message_dialog("Are you sure you want to remove the \"" + selection_text + "\" IWAD from the list?", "Chocolate Box", True) != Gtk.ResponseType.YES:
+            if self.create_simple_message_dialog("Are you sure you want to remove the \"" + selection_text + "\" IWAD from the list?", "Chocolate Box", True, self.window) != Gtk.ResponseType.YES:
                 return
 
             lines = [] # create empty lines list to be filled
@@ -835,7 +932,7 @@ class Main:
             except Exception as e:
                 error_message = "ERROR!: Something happened while trying to read the IWADs file!"
                 print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
-                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
 
             try:
@@ -847,12 +944,12 @@ class Main:
             except Exception as e:
                 error_message = "ERROR!: Something happened while trying to write to the IWADs file!"
                 print(str(e) + "\n" + error_message)
-                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
 
             self.update_iwad_list()
 
-            self.create_simple_message_dialog("Removed the \"" + selection_text + "\" IWAD from the list!")
+            self.create_simple_message_dialog("Removed the \"" + selection_text + "\" IWAD from the list!", "Chocolate Box", False, self.window)
 
         elif selected_stack == "PWADs":
             listbox = self.builder.get_object("pwad_listbox")
@@ -864,15 +961,15 @@ class Main:
                 selection_text.append(pwad_row.get_child().get_text())
 
             if len(selection_text) > 1:
-                if self.create_simple_message_dialog("Are you sure you want to remove the selected PWADs from the list? (" + ", ".join(selection_text) + ")", "Chocolate Box", True) != Gtk.ResponseType.YES:
+                if self.create_simple_message_dialog("Are you sure you want to remove the selected PWADs from the list? (" + ", ".join(selection_text) + ")", "Chocolate Box", True, self.window) != Gtk.ResponseType.YES:
                     return
             elif len (selection_text) == 1:
-                if self.create_simple_message_dialog("Are you sure you want to remove the \"" + selection_text[0] + "\" PWAD from the list?", "Chocolate Box", True) != Gtk.ResponseType.YES:
+                if self.create_simple_message_dialog("Are you sure you want to remove the \"" + selection_text[0] + "\" PWAD from the list?", "Chocolate Box", True, self.window) != Gtk.ResponseType.YES:
                     return
             else:
                 message = "No PWAD is selected for removal!"
                 print(message)
-                self.create_simple_message_dialog(message)
+                self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
                 return
             
             lines = [] # create empty lines list to be filled
@@ -883,7 +980,7 @@ class Main:
             except Exception as e:
                 error_message = "ERROR!: Something happened while trying to read the PWADs file!"
                 print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
-                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
 
             try:
@@ -899,15 +996,15 @@ class Main:
             except Exception as e:
                 error_message = "ERROR!: Something happened while trying to write to the PWADs file!"
                 print(str(e) + "\n" + error_message)
-                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
 
             self.update_pwad_list()
 
             if len(selection_text) > 1:
-                self.create_simple_message_dialog("Removed the selected PWADs from the list! (" + ", ".join(selection_text) + ")")
+                self.create_simple_message_dialog("Removed the selected PWADs from the list! (" + ", ".join(selection_text) + ")", "Chocolate Box", False, self.window)
             else:
-                self.create_simple_message_dialog("Removed the \"" + selection_text[0] + "\" PWAD from the list!")
+                self.create_simple_message_dialog("Removed the \"" + selection_text[0] + "\" PWAD from the list!", "Chocolate Box", False, self.window)
 
         else:
             sys.exit(-1) # selected stack's name is not expected; exit with code -1
@@ -928,7 +1025,7 @@ class Main:
             if selected_row == None:
                 message = "No IWAD is selected to be moved!"
                 print(message)
-                self.create_simple_message_dialog(message)
+                self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
                 return
 
             selected_text = selected_row.get_child().get_text() # get text from selected row
@@ -950,21 +1047,21 @@ class Main:
                 error_message = (   "ERROR!: Something happened while trying to read the file that keeps track of IWADs!\n" +
                                     "Could not move the selected IWAD.")
                 print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
-                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
 
             # check if index_to_move was found
             if index_to_move < 0:
                 error_message = "ERROR!: The selected IWAD could not be found in the IWADs file!"
                 print(error_message, ' ', '\n', file = sys.stderr)
-                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
 
             # check if first item
             if index_to_move == 1:
                 message = "Cannot move the first IWAD any further up!"
                 print(message)
-                self.create_simple_message_dialog(message)
+                self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
                 return
 
             # write to IWADs file
@@ -989,7 +1086,7 @@ class Main:
                 error_message = (   "ERROR!: Something happened while trying to write to the file that keeps track of IWADs!\n" +
                                     "Could not move the selected IWAD.")
                 print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
-                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
 
 
@@ -1011,14 +1108,14 @@ class Main:
             if len(selected_rows) < 1:
                 message = "No PWAD is selected to be moved!"
                 print(message)
-                self.create_simple_message_dialog(message)
+                self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
                 return
 
             # ensure no more than one item is selected
             elif len(selected_rows) > 1:
                 message = "Cannot move more than one PWAD at a time!"
                 print(message)
-                self.create_simple_message_dialog(message)
+                self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
                 return
 
             selected_text = selected_rows[0].get_child().get_text() # get text from selected row
@@ -1040,21 +1137,21 @@ class Main:
                 error_message = (   "ERROR!: Something happened while trying to read the file that keeps track of PWADs!\n" +
                                     "Could not move the selected PWAD.")
                 print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
-                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
 
             # check if index_to_move was found
             if index_to_move < 0:
                 error_message = "ERROR!: The selected PWAD could not be found in the PWADs file!"
                 print(error_message, ' ', '\n', file = sys.stderr)
-                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
 
             # check if first item
             if index_to_move == 1:
                 message = "Cannot move the first PWAD any further up!"
                 print(message)
-                self.create_simple_message_dialog(message)
+                self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
                 return
 
             # write to PWADs file
@@ -1079,7 +1176,7 @@ class Main:
                 error_message = (   "ERROR!: Something happened while trying to write to the file that keeps track of PWADs!\n" +
                                     "Could not move the selected PWAD.")
                 print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
-                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
 
 
@@ -1110,7 +1207,7 @@ class Main:
             if selected_row == None:
                 message = "No IWAD is selected to be moved!"
                 print(message)
-                self.create_simple_message_dialog(message)
+                self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
                 return
 
             selected_text = selected_row.get_child().get_text() # get text from selected row
@@ -1132,21 +1229,21 @@ class Main:
                 error_message = (   "ERROR!: Something happened while trying to read the file that keeps track of IWADs!\n" +
                                     "Could not move the selected IWAD.")
                 print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
-                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
 
             # check if index_to_move was found
             if index_to_move < 0:
                 error_message = "ERROR!: The selected IWAD could not be found in the IWADs file!"
                 print(error_message, ' ', '\n', file = sys.stderr)
-                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
 
             # check if last item
             if index_to_move >= len(lines) - 1:
                 message = "Cannot move the last IWAD any further down!"
                 print(message)
-                self.create_simple_message_dialog(message)
+                self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
                 return
 
             # write to IWADs file
@@ -1171,7 +1268,7 @@ class Main:
                 error_message = (   "ERROR!: Something happened while trying to write to the file that keeps track of IWADs!\n" +
                                     "Could not move the selected IWAD.")
                 print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
-                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
 
 
@@ -1193,14 +1290,14 @@ class Main:
             if len(selected_rows) < 1:
                 message = "No PWAD is selected to be moved!"
                 print(message)
-                self.create_simple_message_dialog(message)
+                self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
                 return
 
             # ensure no more than one item is selected
             elif len(selected_rows) > 1:
                 message = "Cannot move more than one PWAD at a time!"
                 print(message)
-                self.create_simple_message_dialog(message)
+                self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
                 return
 
             selected_text = selected_rows[0].get_child().get_text() # get text from selected row
@@ -1222,21 +1319,21 @@ class Main:
                 error_message = (   "ERROR!: Something happened while trying to read the file that keeps track of PWADs!\n" +
                                     "Could not move the selected PWAD.")
                 print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
-                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
 
             # check if index_to_move was found
             if index_to_move < 0:
                 error_message = "ERROR!: The selected PWAD could not be found in the PWADs file!"
                 print(error_message, ' ', '\n', file = sys.stderr)
-                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
 
             # check if last item
             if index_to_move >= len(lines) - 1:
                 message = "Cannot move the last PWAD any further down!"
                 print(message)
-                self.create_simple_message_dialog(message)
+                self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
                 return
 
             # write to PWADs file
@@ -1261,7 +1358,7 @@ class Main:
                 error_message = (   "ERROR!: Something happened while trying to write to the file that keeps track of PWADs!\n" +
                                     "Could not move the selected PWAD.")
                 print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
-                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
 
 
@@ -1279,7 +1376,7 @@ class Main:
 
 
     # Called when the IWAD edit confirmation button is clicked.
-    def on_iwad_edit_confirm_button_clicked(self, object, selection_text = None):
+    def on_iwad_edit_confirm_button_clicked(self, object, selection_text):
         # get widgets
         window = self.builder.get_object("add_iwad_window")
         iwad_name = self.builder.get_object("iwad_name")
@@ -1309,7 +1406,6 @@ class Main:
             return
 
         lines = [] # create empty list for lines
-
 
         # check for duplicates
         try:
@@ -1344,7 +1440,7 @@ class Main:
         except Exception as e:
             error_message = "ERROR!: Something happened while trying to write to the IWADs file!"
             print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
-            self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, window)
             return
         
         self.update_iwad_list()
@@ -1419,6 +1515,81 @@ class Main:
         window.hide()
 
 
+    # Called when the PWAD edit confirmation button is clicked.
+    def on_pwad_edit_confirm_button_clicked(self, object, selection_text):
+        # get widgets
+        window = self.builder.get_object("add_pwad_window")
+        pwad_name = self.builder.get_object("pwad_name")
+        pwad_file = self.builder.get_object("pwad_file")
+        pwad_method = self.builder.get_object("pwad_method")
+        pwad_listbox = self.builder.get_object("pwad_listbox")
+
+        # get information
+        pwad_name_str = pwad_name.get_text()
+        pwad_file_str = pwad_file.get_filename()
+        pwad_method_str = pwad_method.get_active_id()
+        if pwad_file_str == None:
+            pwad_file_str = ""
+
+        # check if any elements are empty
+        if pwad_name_str == "" or pwad_file_str == "":
+            message = "ERROR!: PWAD name and file cannot be left empty!"
+            print(message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(message, "Chocolate Box - Error", False, window)
+            return
+
+        # check if any elements contain colons
+        if ":" in pwad_name_str or ":" in pwad_file_str:
+            error_message = "ERROR!: None of the PWAD elements can contain \":\"!"
+            print(error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, window)
+            return
+
+        lines = [] # create empty list for lines
+
+        # check for duplicates
+        try:
+            with open(self.pwads_file, "r") as file:
+                lines = file.readlines()
+                for line in lines:
+                    if line[:len(pwad_name_str) + 1] == pwad_name_str + ":" and pwad_name_str != selection_text:
+                        message = "An PWAD with the specified name already exists!"
+                        print(message)
+                        self.create_simple_message_dialog(message, "Chocolate Box", False, window)
+                        return
+        except Exception as e:
+            error_message = "ERROR!: Something happened while trying to check the PWADs file for duplicate names!"
+            print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, window)
+            return
+    
+        # write to PWADs file
+        altered_line_index = -1 # the index of the line that was changed
+        try:
+            with open(self.pwads_file, "w") as file:
+                index = 0 # the current index
+                for line in lines:
+                    if line[:len(selection_text) + 1] == selection_text + ":":
+                        altered_line_index = index
+                        file.write(pwad_name_str + ":" + pwad_file_str + ":" + pwad_method_str + "\n")
+                        index += 1
+                        continue
+                    file.write(line)
+                    index += 1
+        except Exception as e:
+            error_message = "ERROR!: Something happened while trying to write to the PWADs file!"
+            print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, window)
+            return
+
+        self.update_pwad_list()
+        row = pwad_listbox.get_row_at_index(altered_line_index - 1)
+        if row != None:
+            pwad_listbox.select_row(row)
+
+        window.hide()
+
+
     # Called when the PWAD add confirmation button is clicked.
     def on_pwad_add_confirm_button_clicked(self, object, data = None):
         # get widgets
@@ -1430,7 +1601,7 @@ class Main:
         # get information
         pwad_name_str = pwad_name.get_text()
         pwad_file_str = pwad_file.get_filename()
-        pwad_method_str = "merge" if pwad_method.get_active_text() == "Merge" else "file"
+        pwad_method_str = pwad_method.get_active_id()
         if pwad_file_str == None:
             pwad_file_str = ""
 
@@ -1452,7 +1623,7 @@ class Main:
         try:
             with open(self.pwads_file, "r") as file:
                 for line in file.readlines():
-                    if line[:len(pwad_name_str)] == pwad_name_str:
+                    if line[:len(pwad_name_str) + 1] == pwad_name_str + ":":
                         message = "An PWAD with the specified name already exists!"
                         print(message)
                         self.create_simple_message_dialog(message, "Chocolate Box", False, window)
