@@ -924,12 +924,7 @@ class Main:
             if self.create_simple_message_dialog("Are you sure you want to remove the \"" + selection_text + "\" IWAD from the list?", "Chocolate Box", True, self.window) != Gtk.ResponseType.YES:
                 return
 
-        # check if any elements are empty
-        if pwad_name_str == "" or pwad_file_str == "":
-            message = "ERROR!: PWAD name and file cannot be left empty!"
-            print(message, ' ', '\n', file = sys.stderr)
-            self.create_simple_message_dialog(message, "Chocolate Box - Error", False, window)
-            return
+            lines = [] # create empty lines list to be filled
 
             try:
                 with open(self.iwads_file, "r") as file:
@@ -952,14 +947,7 @@ class Main:
                 self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
                 return
 
-        # append information to PWADs file
-        try:
-            with open(self.pwads_file, "a") as file:
-                file.write(pwad_name_str + ":" + pwad_file_str + ":" + pwad_method_str + "\n") # write IWAD information
-        except Exception as e:
-            error_message = "ERROR!: Something happened while trying to append the PWAD information to the PWADs file!"
-            print(str(e) + "\n" + error_message)
-            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, window)
+            self.update_iwad_list()
 
             self.create_simple_message_dialog("Removed the \"" + selection_text + "\" IWAD from the list!", "Chocolate Box", False, self.window)
 
@@ -1710,73 +1698,6 @@ class Main:
     def on_add_iwad_window_delete_event(self, object, data = None):
         object.hide()
         return True
-
-
-    # Called when add_pwad_window is deleted.
-    def on_add_pwad_window_delete_event(self, object, data = None):
-        object.hide()
-        return True
-
-
-    # Called when a key is pressed with the selection window active.
-    def on_selection_window_key_press_event(self, object, event):
-        # shift selected item up/down if holding shift and control while pressing arrow keys
-        if event.state & (Gdk.ModifierType.SHIFT_MASK | Gdk.ModifierType.CONTROL_MASK) == Gdk.ModifierType.SHIFT_MASK | Gdk.ModifierType.CONTROL_MASK:
-            if event.keyval == Gdk.KEY_Up:
-                self.on_move_up_button_clicked(None)
-            elif event.keyval == Gdk.KEY_Down:
-                self.on_move_down_button_clicked(None)
-
-        # ignore key modifiers
-        on_chromeos = os.path.isdir("/mnt/chromeos") # determine if on chromeos
-        if (not event.state == 0) and not (on_chromeos and event.state == Gdk.ModifierType.MOD2_MASK):
-            return
-
-        # get widgets
-        list_stack = self.builder.get_object("list_stack")
-       
-        # find the selected stack
-        selected_stack = list_stack.get_visible_child_name()
-        
-        if event.type == Gdk.EventType.KEY_PRESS:
-            # swap IWADs/PWADs menus when the left/right arrows are pressed
-            if event.keyval == Gdk.KEY_Left or event.keyval == Gdk.KEY_Right:
-                if selected_stack == "PWADs":
-                    list_stack.set_visible_child_name("IWADs")
-                elif selected_stack == "IWADs":
-                    list_stack.set_visible_child_name("PWADs")
-                else:
-                    sys.exit(-1) # selected stack's name is not expected; exit with code -1
-
-
-            # quit if ESCAPE is pressed
-            if event.keyval == Gdk.KEY_Escape:
-                Gtk.main_quit()
-
-            
-            # "press add button" if A is pressed
-            if event.keyval == Gdk.KEY_a:
-                self.on_add_button_clicked(None)
-            
-
-            # add IWAD if I is pressed
-            if event.keyval == Gdk.KEY_i:
-                self.open_add_iwad_window()
-
-            
-            # add PWAD if P is pressed
-            if event.keyval == Gdk.KEY_p:
-                self.open_add_pwad_window() 
-
-
-            # "press remove button" if D, DELETE, or BACKSPACE is pressed
-            if event.keyval == Gdk.KEY_d or event.keyval == Gdk.KEY_Delete or event.keyval == Gdk.KEY_KP_Delete or event.keyval == Gdk.KEY_BackSpace:
-                self.on_remove_button_clicked(None)
-
-            
-            # open settings if S is pressed
-            if event.keyval == Gdk.KEY_s:
-                self.on_settings_button_clicked(None)
 
 
     # Called when add_pwad_window is deleted.
