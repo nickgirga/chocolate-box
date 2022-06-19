@@ -94,6 +94,7 @@
               <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="tooltip-text" translatable="yes">A descriptive name for the IWAD</property>
                 <property name="spacing">6</property>
                 <child>
                   <object class="GtkLabel">
@@ -133,6 +134,7 @@
               <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="tooltip-text" translatable="yes">The location of the IWAD</property>
                 <property name="spacing">6</property>
                 <child>
                   <object class="GtkLabel">
@@ -171,6 +173,7 @@
               <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="tooltip-text" translatable="yes">The executable used to launch the IWAD</property>
                 <property name="spacing">6</property>
                 <child>
                   <object class="GtkLabel">
@@ -295,6 +298,7 @@
               <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="tooltip-text" translatable="yes">A descriptive name for the PWAD</property>
                 <property name="spacing">6</property>
                 <child>
                   <object class="GtkLabel">
@@ -334,6 +338,7 @@
               <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="tooltip-text" translatable="yes">The location of the PWAD</property>
                 <property name="spacing">6</property>
                 <child>
                   <object class="GtkLabel">
@@ -372,6 +377,7 @@
               <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="tooltip-text" translatable="yes">How the PWAD should be applied</property>
                 <property name="spacing">6</property>
                 <child>
                   <object class="GtkLabel">
@@ -930,6 +936,7 @@
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <property name="tooltip-text" translatable="yes">Overrides the executable used to launch the IWAD</property>
             <child>
               <object class="GtkLabel">
                 <property name="visible">True</property>
