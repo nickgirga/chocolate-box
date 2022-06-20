@@ -13,7 +13,7 @@
    - Allows you to override the stored source port path temporarily
  - Supports `-file` and `-merge` [modifications](https://gitlab.com/nickgirga/chocolate-box/-/wikis/home#how-do-i-use-mods)
    - Can use [numerous modifications](https://gitlab.com/nickgirga/chocolate-box/-/wikis/home#enablingdisabling-pwads) at the same time
- - Keyboard shortcuts for quick navigation
+ - [Keyboard shortcuts](https://gitlab.com/nickgirga/chocolate-box/-/wikis/Keyboard-Shortcuts) for quick navigation
  - Provides a unified interface for all of your DOOM setups
    - This is useful if you want to share a controller scheme across multiple source ports using [Steam Input](https://partner.steamgames.com/doc/features/steam_controller/getting_started_for_players)
 
