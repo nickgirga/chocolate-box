@@ -30,6 +30,7 @@ Releases will typically be distributed as Arch or Debian-based packages (`[packa
 
 If for whatever reason the packages are not suitable for you, see the [Don't Want to Install?](#dont-want-to-install) section.
 
+#### [Using Windows?](https://gitlab.com/nickgirga/chocolate-box/-/merge_requests/29#note_999887305)
 
 # Don't Want to Install?
 Chocolate Box is just a [Python](https://www.python.org/) script that uses [PyGObject](https://pygobject.readthedocs.io/en/latest/) to draw [GTK3](https://www.gtk.org/) widgets. That means you can use it without installing the package itself or building anything.
