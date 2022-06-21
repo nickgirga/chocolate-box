@@ -272,6 +272,8 @@ class Main:
                     "crispy-doom",
                     "crispy-heretic",
                     "crispy-hexen",
+                    "prboom-plus",
+                    "prboom",
                     "gzdoom",
                     "zdoom"] # executables to check for
         
@@ -611,6 +613,12 @@ class Main:
                 return
         elif exec_path == "gzdoom" or exec_path == "zdoom":
             message = (("GZDoom" if exec_path == "gzdoom" else "ZDoom") + " does not have a separate setup executable.\n" +
+                        "Please configure settings with the in-game menus.")
+            print(message)
+            self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
+            return
+        elif exec_path == "prboom" or exec_path == "prboom-plus":
+            message = (("PrBoom" if exec_path == "prboom" else "PrBoom+") + " does not have a separate setup executable.\n" +
                         "Please configure settings with the in-game menus.")
             print(message)
             self.create_simple_message_dialog(message, "Chocolate Box", False, self.window)
