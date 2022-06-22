@@ -14,7 +14,7 @@ echo
 
 
 # Check if x86_64
-if ! [ '`uname -m`' == 'x86_64' ];
+if ! [ "`uname -m`" == "x86_64" ];
 then
 	echo ERROR!: This CPU architecture is not supported by this build script.
 	exit 2
