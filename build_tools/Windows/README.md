@@ -6,9 +6,9 @@ In this directory, you will find a build script for Windows on x86_64 machines. 
 #### [Easy] How do I use it?
 This script actually only exists because it makes building a new stable release for Windows much easier for me. The idea is that a new Windows build will be created for each major release. So you don't need to do anything!
 
-You can download these stable releases [here](). Then, you just need to decompress the archive and launch the `chocolate-box.exe` file whenever you want to use Chocolate Box. ***Done!*** You can create a shortcut to this EXE file for ease of access.
+You can download these stable releases [here](https://gitlab.com/nickgirga/chocolate-box/-/releases). Then, you just need to decompress the archive and launch the `chocolate-box.exe` file whenever you want to use Chocolate Box. ***Done!*** You can create a shortcut to this EXE file for ease of access.
 
-You may also choose to build the application yourself if you so please. This may be useful if the official builds are not working well for you, you want to test out the latest features, or you want to help contribute to the project. For more information, see the [How do I build it myself?]() section. ***Note: most users will not have to do this.***
+You may also choose to build the application yourself if you so please. This may be useful if the official builds are not working well for you, you want to test out the latest features, or you want to help contribute to the project. For more information, see the [How do I build it myself?](#advanced-how-do-i-build-it-myself) section. ***Note: most users will not have to do this.***
 
 
 
