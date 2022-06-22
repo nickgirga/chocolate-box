@@ -115,7 +115,7 @@ echo
 # Build Windows Application Using PyInstaller
 echo Building Chocolate Box for Windows...
 cd ./chocolate-box/
-/mingw64/bin/pyinstaller.exe -i ./res/icon/icon_256.ico -wF ./chocolate-box
+/mingw64/bin/pyinstaller.exe -i ./res/icon/icon_256.ico -w ./chocolate-box
 if ! [ "$?" == "0" ];
 then
 	echo ERROR!: Something happened while trying to build the application for Windows using PyInstaller!
