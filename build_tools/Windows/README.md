@@ -1,6 +1,6 @@
 # build_tools/Windows
 #### What is this script?
-In this directory, you will find a build script for Windows on x86_64 machines. It is intended to be used in the MSYS2 environment to create an executable that can be used independently on MSYS2. It uses PyInstaller to collect the dependencies that Chocolate Box needs and places them in output directory with the EXE, so the resulting EXE can simply be run by the host Windows machine without needing any additional dependencies installed.
+In this directory, you will find a build script for Windows on x86_64 machines. It is intended to be used in the MSYS2 environment to create an executable that can be used independently of MSYS2. It uses PyInstaller to collect the dependencies that Chocolate Box needs and places them in output directory with the EXE, so the resulting EXE can simply be run by the host Windows machine without needing any additional dependencies installed.
 
 
 #### [Easy] How do I use it?
