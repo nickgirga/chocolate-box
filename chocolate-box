@@ -264,7 +264,10 @@ class Main:
 
     
     # Returns a list of the available executables that we know Chocolate Box is compatible with.
-    def get_exec(self):
+    def get_exec(self) -> []:
+        if os.name == "nt":
+            return [] # do not check for commands on Windows
+
         to_check = ["chocolate-doom",
                     "chocolate-heretic",
                     "chocolate-hexen",
@@ -282,7 +285,7 @@ class Main:
             if self.command_exists(check):
                 results.append(check) # add executable to list if it is available on the system
 
-        if results == []:
+        if results == [] and not os.path.isfile(self.iwads_file): # warn user the first time that no commands could be found
             warning_message = ( "WARNING!: DOOM source ports with known compatibility could not be found!\n" +
                                 "You must specify a path to a DOOM source port when adding an IWAD!")
             print(warning_message)
