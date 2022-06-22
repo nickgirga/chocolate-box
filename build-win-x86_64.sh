@@ -8,10 +8,17 @@
 PYINSTALLER_SOURCE="https://files.pythonhosted.org/packages/c9/41/fbb2f0e6e1934a47a99295d67ba178477f8809ae939c96608c711596f478/pyinstaller-5.1.tar.gz" # where the PyInstaller archive is downloaded from
 
 
-
 # Check if MSYS2 environment
 pacman -Qi msys2-runtime &> /dev/null && echo Building executable for Windows... || { echo ERROR!: This environment is not supported for building Chocolate Box for Windows. Please use MSYS2.; exit 1; }
 echo
+
+
+# Check if x86_64
+if ! [ '`uname -m`' == 'x86_64' ];
+then
+	echo ERROR!: This CPU architecture is not supported by this build script.
+	exit 2
+fi
 
 
 # Update system packages
@@ -20,7 +27,7 @@ pacman -Syyu --noconfirm
 if ! [ "$?" == "0" ];
 then
 	echo ERROR!: Something happened while trying to update the system packages!
-	exit 2
+	exit 3
 fi
 echo Finished Updating System Packages!
 echo
@@ -32,7 +39,7 @@ pacman -S --noconfirm --needed wget git mingw-w64-x86_64-python3 mingw-w64-x86_6
 if ! [ "$?" == "0" ];
 then
 	echo ERROR!: Something happened while trying to install dependencies using \`pacman\`!
-	exit 3
+	exit 4
 fi
 echo Finished Installing Dependencies Using \`pacman\`!
 echo
@@ -44,11 +51,10 @@ echo Installing Dependencies Using \`pip3.exe\`...
 if ! [ "$?" == "0" ];
 then
 	echo ERROR!: Something happened while trying to install dependencies using \`pip.exe\`!
-	exit 4
+	exit 5
 fi
 echo Finished Installing Dependencies Using \`pip3.exe\`!
 echo
-
 
 
 # Install PyInstaller if Needed
@@ -60,7 +66,7 @@ then
 	if ! [ "$?" == "0" ];
 	then
 		echo ERROR!: Something happened while trying to download PyInstaller!
-		exit 5
+		exit 6
 	fi
 	echo Finished Downloading PyInstaller!
 	echo
@@ -72,7 +78,7 @@ then
 	if ! [ "$?" == "0" ];
 	then
 		echo ERROR!: Something happened while trying to decompress the PyInstaller archive!
-		exit 6
+		exit 7
 	fi
 	echo Finished Decompressing PyInstaller Archive!
 	echo
@@ -86,7 +92,7 @@ then
 	then
 		echo ERROR!: Something happened while trying to build and install PyInstaller!
 		cd ../
-		exit 7
+		exit 8
 	fi
 	cd ../
 	echo Finished Building and Installing PyInstaller!
@@ -100,10 +106,11 @@ git clone https://gitlab.com/nickgirga/chocolate-box.git
 if ! [ "$?" == "0" ];
 then
 	echo ERROR!: Something happened while trying to clone the Chocolate Box repository using Git!
-	exit 8
+	exit 9
 fi
 echo Finished cloning Chocolate Box repository!
 echo
+
 
 # Build Windows Application Using PyInstaller
 echo Building Chocolate Box for Windows...
@@ -112,19 +119,19 @@ cd ./chocolate-box/
 if ! [ "$?" == "0" ];
 then
 	echo ERROR!: Something happened while trying to build the application for Windows using PyInstaller!
-	exit 9
+	exit 10
 fi
 cp ./chocolate-box.ui "$PWD/dist/chocolate-box/chocolate-box.ui"
 if ! [ "$?" == "0" ];
 then
 	echo ERROR!: Something happened while trying to copy the UI template to the build directory!
-	exit 10
+	exit 11
 fi
 cp -r ./res/ "$PWD/dist/chocolate-box/res/"
 if ! [ "$?" == "0" ];
 then
 	echo ERROR!: Something happened while trying to copy the resources directory to the build directory!
-	exit 11
+	exit 12
 fi
 echo Finished Building Chocolate Box for Windows!
 echo
