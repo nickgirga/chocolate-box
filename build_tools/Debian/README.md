@@ -1,6 +1,6 @@
-# PKGBUILD/Ubuntu
+# build_tools/Debian
 #### What is *this* "PKGBUILD"?
-*This* `PKGBUILD` (not to be confused with [this](PKGBUILD/Arch/PKGBUILD) one) is a file that describes how the `makedeb` utility should construct a package to be installed with `dpkg` or `apt`.
+*This* `PKGBUILD` (not to be confused with [this](build_tools/Arch/PKGBUILD) one) is a file that describes how the `makedeb` utility should construct a package to be installed with `dpkg` or `apt`.
 It provides your package manager with information such as which dependencies to install and what files to keep track of (in order to remove them upon uninstall). This is all facilitated by the package manager, `apt` (`dpkg` won't resolve dependencies by itself), but the `makedeb` tool helps us format the package correctly by simply providing it the information it needs in the `PKGBUILD` file.
 This makes it easier for others to contribute to the packaging part of a project and it also makes it easier to audit unofficial apps before installing them, as you can see exactly how it was constructed and follow any source links to ensure it doesn't download anything strange.
 
@@ -24,7 +24,7 @@ Optionally, you can build this package yourself. If the provided package is not 
 #### [Advanced] How do I build it myself?
 ***WARNING!: Only proceed if you are familiar with build automation tools!***
 
-The `makedeb` utility doesn't actually come with Ubuntu. At the time of writing, a single command can be pasted and run to set it up entirely. You can find this command on the website for `makedeb`: [makedeb.org](https://www.makedeb.org/).
+The `makedeb` utility doesn't actually come with Debian. At the time of writing, a single command can be pasted and run to set it up entirely. You can find this command on the website for `makedeb`: [makedeb.org](https://www.makedeb.org/).
 
 After installing `makedeb`, navigate to the directory that contains the `PKGBUILD` file and run `makedeb -s`. This will just install the needed dependencies and build the package. You can install it as you would a distributed package (as described in the [How do I use it?](#easy-how-do-i-use-it) section) or you can automatically install it after it finishes building by giving `makedeb` an additional `-i` option (e.g. `makedeb -si`).
 

@@ -115,23 +115,35 @@ echo
 # Build Windows Application Using PyInstaller
 echo Building Chocolate Box for Windows...
 cd ./chocolate-box/
-/mingw64/bin/pyinstaller.exe -i ./res/icon/icon_256.ico -w ./chocolate-box
+/mingw64/bin/pyinstaller.exe -i ./res/icon/icon_256.ico -w ./chocolate-box # build
 if ! [ "$?" == "0" ];
 then
 	echo ERROR!: Something happened while trying to build the application for Windows using PyInstaller!
 	exit 10
 fi
-cp ./chocolate-box.ui "$PWD/dist/chocolate-box/chocolate-box.ui"
+cp ./chocolate-box.ui "$PWD/dist/chocolate-box/chocolate-box.ui" # copy UI template
 if ! [ "$?" == "0" ];
 then
 	echo ERROR!: Something happened while trying to copy the UI template to the build directory!
 	exit 11
 fi
-cp -r ./res/ "$PWD/dist/chocolate-box/res/"
+mkdir -p "$PWD/dist/chocolate-box/res/icon/" # create icon directory
 if ! [ "$?" == "0" ];
 then
-	echo ERROR!: Something happened while trying to copy the resources directory to the build directory!
+	echo ERROR!: Something happened while trying to create the local icon directory.
 	exit 12
+fi
+cp ./res/icon/icon_128.png "$PWD/dist/chocolate-box/res/icon/icon_128.png" # copy about logo
+if ! [ "$?" == "0" ];
+then
+	echo ERROR!: Something happened while trying to copy the x128 icon!
+	exit 13
+fi
+cp ./res/icon/icon_256.png "$PWD/dist/chocolate-box/res/icon/icon_256.png" # copy window icon
+if ! [ "$?" == "0" ];
+then
+	echo ERROR!: Something happened while trying to copy the x256 icon!
+	exit 14
 fi
 echo Finished Building Chocolate Box for Windows!
 echo

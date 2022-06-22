@@ -1,4 +1,4 @@
-# PKGBUILD/Arch
+# build_tools/Arch
 #### What is a "PKGBUILD"?
 A `PKGBUILD` is usually a file that describes how the `makepkg` utility should construct a package to be installed with Arch Linux's package manager, `pacman`.
 It provides your package manager with information such as which dependencies to install and what files to keep track of (in order to remove them upon uninstall). This is all facilitated by the package manager, `pacman`, but the `makepkg` tool helps us format the package correctly by simply providing it the information it needs in the `PKGBUILD` file.
