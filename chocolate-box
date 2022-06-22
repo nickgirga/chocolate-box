@@ -265,7 +265,11 @@ class Main:
     
     # Returns a list of the available executables that we know Chocolate Box is compatible with.
     def get_exec(self) -> []:
-        if os.name == "nt":
+        if os.name == "nt" and not os.path.isfile(self.iwads_file): # warn Windows user on first start that they need to configure a source port
+            warning_message = ( "WARNING!: Could not find a DOOM source port!\n" +
+                                "You must specify a path to a DOOM source port when adding an IWAD!")
+            print(warning_message)
+            self.create_simple_message_dialog(warning_message)
             return [] # do not check for commands on Windows
 
         to_check = ["chocolate-doom",
@@ -298,10 +302,11 @@ class Main:
     def update_iwad_list(self):
         if not os.path.isfile(self.iwads_file):
             # no IWADs file
-            message = ( "Chocolate Box could not find an IWADs file.\n" +
-                        "A new IWADs file will be created in the configuration directory.")
-            print(message)
-            self.create_simple_message_dialog(message)
+            if self.verbose:
+                message = ( "Chocolate Box could not find an IWADs file.\n" +
+                            "A new IWADs file will be created in the configuration directory.")
+                print(message)
+                self.create_simple_message_dialog(message)
 
             iwads_path = Path(self.iwads_file) # create Path object
             iwads_path.parent.mkdir(exist_ok = True, parents = True) # create parent directory if needed
@@ -368,10 +373,11 @@ class Main:
     def update_pwad_list(self):
         if not os.path.isfile(self.pwads_file):
             # no PWADs file
-            message = ( "Chocolate Box could not find a PWADs file.\n" +
-                        "A new PWADs file will be created in the configuration directory.")
-            print(message)
-            self.create_simple_message_dialog(message)
+            if self.verbose:
+                message = ( "Chocolate Box could not find a PWADs file.\n" +
+                            "A new PWADs file will be created in the configuration directory.")
+                print(message)
+                self.create_simple_message_dialog(message)
 
             pwads_path = Path(self.pwads_file) # create Path object
             pwads_path.parent.mkdir(exist_ok = True, parents = True) # create parent directory if needed
