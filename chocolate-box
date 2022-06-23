@@ -491,9 +491,11 @@ class Main:
         iwad_listbox = self.builder.get_object("iwad_listbox")
         iwad_selection = iwad_listbox.get_selected_row()
 
+
         # create empty strings to fill
         iwad_path = ""
         exec_path = ""
+
 
         # get information from IWAD ListBoxRow
         if iwad_selection != None:
@@ -502,6 +504,7 @@ class Main:
             if iwad_info != None:
                 iwad_path = iwad_info["path"]
                 exec_path = iwad_info["exec"]
+
 
         # override path if specific by the "Executable Override" option
         exec_path_override_combobox = self.builder.get_object("exec_path_override")
@@ -534,13 +537,16 @@ class Main:
                         self.create_simple_message_dialog(message)
                         return
 
+
         # get selected PWAD ListBoxRows
         pwad_listbox = self.builder.get_object("pwad_listbox")
         pwad_selection = pwad_listbox.get_selected_rows()
 
+
         # create empty lists to fill
         file_paths = ["-file"]
         merge_paths = ["-merge"]
+
 
         # get information from PWAD ListBoxRows
         for row in pwad_selection:
@@ -552,9 +558,11 @@ class Main:
                 else:
                     file_paths.append(pwad_info["path"])
 
+
+        # construct launch command
         command = []
         if exec_path == "":
-            command = [ "chocolate-doom" ] # construct launch command
+            command = [ "chocolate-doom" ] 
         else:
             command = [ exec_path ]
 
@@ -567,6 +575,12 @@ class Main:
         if merge_paths != ["-merge"]:
             command += merge_paths
 
+        
+        # if exec_path is a path (not a command), change directory into it's parent directory
+        if os.path.isfile(exec_path):
+            exec_path_dir = Path(exec_path).parent
+            os.chdir(exec_path_dir)
+
 
         if self.launch_behavior == self.LaunchBehavior.MINIMIZE or self.launch_behavior == self.LaunchBehavior.STAY_MINIMIZED:
             self.window.iconify() # minimize launcher
@@ -577,9 +591,12 @@ class Main:
         if self.launch_behavior != self.LaunchBehavior.NONE:
             while Gtk.events_pending():
                 Gtk.main_iteration() # wait for launcher to finish UI execution before launching
-        
+       
+
         if self.verbose:
             print("Launching with command: " + str(command))
+
+
         # start DOOM
         try:
             subprocess.run(command, capture_output = not self.verbose)
