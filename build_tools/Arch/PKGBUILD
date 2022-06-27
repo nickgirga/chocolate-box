@@ -1,6 +1,6 @@
 # Maintainer: Nicholas Girga <contact@nickgirga.com>
 pkgname=chocolate-box-git
-pkgver=r44.df6e037
+pkgver=r174.cc11ef6
 pkgrel=1
 pkgdesc="Simple GUI for Chocolate DOOM"
 arch=('any')
@@ -25,7 +25,9 @@ md5sums=('SKIP')
 
 pkgver() {
 	cd "$srcdir/$pkgname"
-	printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+	ver=`printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"`
+	sed -i "7s/.*/APP_VERSION = \"git-$ver\"/" ./chocolate-box
+	echo $ver
 }
 
 package() {
