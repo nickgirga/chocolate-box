@@ -1874,6 +1874,11 @@ class Main:
             if event.keyval == Gdk.KEY_s:
                 self.on_settings_button_clicked(None)
 
+            
+            # "press edit button" if E is pressed
+            if event.keyval == Gdk.KEY_e:
+                self.on_edit_button_clicked(None)
+
 
 # Start.
 if __name__ == "__main__":
