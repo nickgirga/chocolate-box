@@ -229,6 +229,52 @@ class Main:
         self.update_iwad_list()
         self.update_pwad_list()
 
+
+        # create config file if needed (parent directory should already exist after the selection lists are updated)
+        if not os.path.isfile(self.config_file):
+            try:
+                with open(self.config_file, "w") as file:
+                    file.write("exit")
+            except Exception as e:
+                error_message = "ERROR!: Something happened while trying to write to the configuration file!"
+                print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
+                self.create_simple_message_dialog(error_message, "Chocolate Box - Error")
+                return
+
+
+        # read launch behavior from config file
+        launch_behavior = self.builder.get_object("launch_behavior")
+        lines = []
+        try:
+            with open(self.config_file, "r") as file:
+                lines = file.readlines()
+        except Exception as e:
+            error_message = "ERROR!: Something happened while trying to read the configuration file!"
+            print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
+            return
+
+        if lines == [] or lines == None or len(lines) < 1:
+            error_message = "ERROR!: Could not determine how the launcher should behave after launch!"
+            print(error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
+            return
+
+        if lines[0] == "none":
+            self.launch_behavior = self.LaunchBehavior.NONE
+        elif lines[0] == "minimize":
+            self.launch_behavior = self.LaunchBehavior.MINIMIZE
+        elif lines[0] == "stay_minimized":
+            self.launch_behavior = self.LaunchBehavior.STAY_MINIMIZED
+        elif lines[0] == "exit":
+            self.launch_behavior = self.LaunchBehavior.EXIT
+        else:
+            error_message = "ERROR!: Invalid launch behavior found on line 0 of configuration file!"
+            print(error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
+            return
+        launch_behavior.set_active_id(lines[0])
+
         
         # get main window
         self.window = self.builder.get_object("selection_window")
@@ -489,6 +535,38 @@ class Main:
 
     # Called when the launch button is clicked.
     def on_launch_button_clicked(self, object, data = None):
+        # read launch behavior from file
+        lines = []
+        try:
+            with open(self.config_file, "r") as file:
+                lines = file.readlines()
+        except Exception as e:
+            error_message = "ERROR!: Something happened while trying to read the configuration file!"
+            print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
+            return
+
+        if lines == [] or lines == None or len(lines) < 1:
+            error_message = "ERROR!: Could not determine how the launcher should behave after launch!"
+            print(error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
+            return
+
+        if lines[0] == "none":
+            self.launch_behavior = self.LaunchBehavior.NONE
+        elif lines[0] == "minimize":
+            self.launch_behavior = self.LaunchBehavior.MINIMIZE
+        elif lines[0] == "stay_minimized":
+            self.launch_behavior = self.LaunchBehavior.STAY_MINIMIZED
+        elif lines[0] == "exit":
+            self.launch_behavior = self.LaunchBehavior.EXIT
+        else:
+            error_message = "ERROR!: Invalid launch behavior found on line 0 of configuration file!"
+            print(error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
+            return
+
+
         # get selected IWAD ListBoxRow
         iwad_listbox = self.builder.get_object("iwad_listbox")
         iwad_selection = iwad_listbox.get_selected_row()
@@ -615,6 +693,23 @@ class Main:
             self.window.present() # present launcher
         elif self.launch_behavior == self.LaunchBehavior.EXIT:
             self.window.close() # exit launcher
+
+
+    # Called when the launch behavior value is changed.
+    def on_launch_behavior_changed(self, object, data = None):
+        # get value
+        value = object.get_active_id()
+        # TEMP: write directly to the config file
+        # we will want to create functions for writing to and reading from the config file
+        # because launch behavior is the only value we are storing for now, we are just doing it in-place
+        try:
+            with open(self.config_file, "w") as file:
+                file.write(value)
+        except Exception as e:
+            error_message = "ERROR!: Something happened while trying to write to the configuration file!"
+            print(str(e) + "\n" + error_message, ' ', '\n', file = sys.stderr)
+            self.create_simple_message_dialog(error_message, "Chocolate Box - Error", False, self.window)
+            return
 
 
     # Called when the settings button is clicked.

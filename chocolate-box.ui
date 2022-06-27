@@ -1046,6 +1046,7 @@
                   <item id="stay_minimized" translatable="yes">Stay Minimized</item>
                   <item id="exit" translatable="yes">Exit</item>
                 </items>
+                <signal name="changed" handler="on_launch_behavior_changed" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -1101,6 +1102,7 @@
         </child>
         <child>
           <object class="GtkSeparator">
+            <property name="visible">True</property>
             <property name="can-focus">False</property>
           </object>
           <packing>
@@ -1111,6 +1113,7 @@
         </child>
         <child>
           <object class="GtkModelButton">
+            <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
             <property name="text" translatable="yes">Chocolate Box Settings</property>
