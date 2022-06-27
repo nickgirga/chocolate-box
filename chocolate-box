@@ -280,9 +280,11 @@ class Main:
                     "crispy-doom",
                     "crispy-heretic",
                     "crispy-hexen",
+                    "woof",
                     "prboom-plus",
                     "prboom",
                     "gzdoom",
+                    "lzdoom",
                     "zdoom"] # executables to check for
         
         results = [] # create empty results list
@@ -1871,6 +1873,11 @@ class Main:
             # open settings if S is pressed
             if event.keyval == Gdk.KEY_s:
                 self.on_settings_button_clicked(None)
+
+            
+            # "press edit button" if E is pressed
+            if event.keyval == Gdk.KEY_e:
+                self.on_edit_button_clicked(None)
 
 
 # Start.
