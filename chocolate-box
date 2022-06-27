@@ -280,9 +280,11 @@ class Main:
                     "crispy-doom",
                     "crispy-heretic",
                     "crispy-hexen",
+                    "woof",
                     "prboom-plus",
                     "prboom",
                     "gzdoom",
+                    "lzdoom",
                     "zdoom"] # executables to check for
         
         results = [] # create empty results list
