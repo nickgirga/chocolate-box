@@ -15,6 +15,7 @@ optdepends=('chocolate-doom'
 	    'crispy-doom'
 	    'freedm'
 	    'freedoom')
+conflicts=('chocolate-box')
 source=("$pkgname::git+https://gitlab.com/nickgirga/chocolate-box.git")
 md5sums=('SKIP')
 
