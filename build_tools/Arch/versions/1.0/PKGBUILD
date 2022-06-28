@@ -1,6 +1,6 @@
 # Maintainer: Nicholas Girga <contact@nickgirga.com>
-pkgname=chocolate-box-git
-pkgver=r174.cc11ef6
+pkgname=chocolate-box
+pkgver=1.0
 pkgrel=1
 pkgdesc="Simple GUI for Chocolate DOOM"
 arch=('any')
@@ -9,8 +9,6 @@ license=('MIT')
 depends=('python'
  	 'gtk3'
  	 'python-gobject')
-makedepends=('sed'
-	     'git')
 optdepends=('chocolate-doom'
 	    'crispy-doom'
 	    'zdoom'
@@ -21,19 +19,12 @@ optdepends=('chocolate-doom'
 	    'doom1-wad'
 	    'heretic1-wad'
 	    'hexen1-wad')
-conflicts=('chocolate-box')
-source=("$pkgname::git+https://gitlab.com/nickgirga/chocolate-box.git")
-md5sums=('SKIP')
-
-pkgver() {
-	cd "$srcdir/$pkgname"
-	ver=`printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"`
-	sed -i "7s/.*/APP_VERSION = \"git-$ver\"/" ./chocolate-box
-	echo $ver
-}
+conflicts=('chocolate-box-git')
+source=("https://gitlab.com/nickgirga/$pkgname/-/archive/$pkgver/$pkgname-$pkgver.tar.gz")
+md5sums=('ae7e7ef45621078095ccdacfe443fc9b')
 
 package() {
-	cd "$srcdir/$pkgname"
+	cd "$srcdir/$pkgname-$pkgver"
 	install -Dm755 ./chocolate-box "$pkgdir/usr/bin/chocolate-box"
 	install -Dm644 ./chocolate-box.ui "$pkgdir/usr/share/chocolate-box/chocolate-box.ui"
 	install -Dm644 ./res/icon/icon_128.png "$pkgdir/usr/share/icons/chocolate-box_128.png"
